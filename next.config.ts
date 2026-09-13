@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // this, Next.js blocks cross-origin dev resources (/_next/hmr) in dev.
   allowedDevOrigins: [
     "3000-7478235a-aa59-4311-815c-08edc6c3266e.daytonaproxy01.net",
+    "192.168.1.8",
   ],
 };
 

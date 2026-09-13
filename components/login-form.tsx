@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+
 type Role = "school_admin" | "club_admin";
 
 const roleConfig: Record<

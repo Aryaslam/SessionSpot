@@ -1,0 +1,1076 @@
+Directory structure:
+└── school-class-booking/
+    ├── README.md
+    ├── AGENTS.md
+    ├── CLAUDE.md
+    ├── eslint.config.mjs
+    ├── next.config.ts
+    ├── package.json
+    ├── postcss.config.mjs
+    ├── proxy.ts
+    ├── tsconfig.json
+    ├── app/
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   ├── club-admin/
+    │   │   ├── classrooms/
+    │   │   │   └── page.tsx
+    │   │   ├── dashboard/
+    │   │   │   └── page.tsx
+    │   │   ├── login/
+    │   │   │   └── page.tsx
+    │   │   ├── requests/
+    │   │   │   └── page.tsx
+    │   │   └── responses/
+    │   │       └── page.tsx
+    │   └── school-admin/
+    │       ├── classrooms/
+    │       │   └── page.tsx
+    │       ├── clubs/
+    │       │   └── page.tsx
+    │       ├── dashboard/
+    │       │   └── page.tsx
+    │       ├── login/
+    │       │   └── page.tsx
+    │       └── requests/
+    │           └── page.tsx
+    ├── components/
+    │   ├── login-form.tsx
+    │   └── sign-out-button.tsx
+    └── lib/
+        ├── auth.ts
+        └── supabase/
+            ├── client.ts
+            └── server.ts
+
+================================================
+FILE: README.md
+================================================
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+================================================
+FILE: AGENTS.md
+================================================
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+
+
+================================================
+FILE: CLAUDE.md
+================================================
+@AGENTS.md
+
+
+
+================================================
+FILE: eslint.config.mjs
+================================================
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+
+
+
+================================================
+FILE: next.config.ts
+================================================
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // The Freebuff preview serves the dev server through a proxy host; without
+  // this, Next.js blocks cross-origin dev resources (/_next/hmr) in dev.
+  allowedDevOrigins: [
+    "3000-7478235a-aa59-4311-815c-08edc6c3266e.daytonaproxy01.net",
+  ],
+};
+
+export default nextConfig;
+
+
+
+================================================
+FILE: package.json
+================================================
+{
+  "name": "school-class-booking",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "next": "16.3.4",
+    "postcss": "^8.5.28",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5"
+  }
+}
+
+
+
+================================================
+FILE: postcss.config.mjs
+================================================
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+
+================================================
+FILE: proxy.ts
+================================================
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+
+export async function proxy(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabasePublishableKey) {
+    // Nothing to refresh without config; let pages surface the config error.
+    return supabaseResponse;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        );
+        supabaseResponse = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
+
+  // IMPORTANT: do not run code between createServerClient and getUser().
+  // getUser() validates the token server-side and refreshes expired cookies.
+  await supabase.auth.getUser();
+
+  return supabaseResponse;
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};
+
+
+
+================================================
+FILE: tsconfig.json
+================================================
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+
+
+================================================
+FILE: app/globals.css
+================================================
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+
+================================================
+FILE: app/layout.tsx
+================================================
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "School Class Booking",
+  description: "School classroom booking for clubs and school admins",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">{children}</body>
+    </html>
+  );
+}
+
+
+
+================================================
+FILE: app/page.tsx
+================================================
+import Link from "next/link";
+
+export default function Home() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+      <div className="w-full max-w-md text-center space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            School Class Booking
+          </h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            Request classrooms for your club, and let school administrators
+            review, approve, or reject them.
+          </p>
+        </div>
+
+        <div className="grid gap-3">
+          <Link
+            href="/school-admin/login"
+            className="rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
+          >
+            School Admin
+          </Link>
+          <Link
+            href="/club-admin/login"
+            className="rounded-md border border-neutral-300 dark:border-neutral-700 py-2.5 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
+            Club Admin
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/club-admin/classrooms/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Classrooms · Club Admin" };
+
+export default async function ClubAdminClassrooms() {
+  await requireRole("club_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Classrooms</h1>
+          <SignOutButton loginPath="/club-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Availability picker and request creation will be built here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/club-admin/dashboard/page.tsx
+================================================
+import Link from "next/link";
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Club Admin Dashboard" };
+
+export default async function ClubAdminDashboard() {
+  const profile = await requireRole("club_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              Club Admin
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {profile.display_name}
+            </h1>
+          </div>
+          <SignOutButton loginPath="/club-admin/login" />
+        </header>
+
+        <section className="grid gap-4 sm:grid-cols-3">
+          <Link
+            href="/club-admin/classrooms"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">Classrooms</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Check availability and pick rooms
+            </p>
+          </Link>
+          <Link
+            href="/club-admin/requests"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">My requests</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Create, edit, or cancel requests
+            </p>
+          </Link>
+          <Link
+            href="/club-admin/responses"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">Responses</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              View accepted or rejected requests
+            </p>
+          </Link>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/club-admin/login/page.tsx
+================================================
+import LoginForm from "@/components/login-form";
+
+export const metadata = { title: "Club Admin Login" };
+
+export default function ClubAdminLoginPage() {
+  return <LoginForm role="club_admin" />;
+}
+
+
+
+================================================
+FILE: app/club-admin/requests/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "My requests · Club Admin" };
+
+export default async function ClubAdminRequests() {
+  await requireRole("club_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            My requests
+          </h1>
+          <SignOutButton loginPath="/club-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Request history and creation flow will be built here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/club-admin/responses/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Responses · Club Admin" };
+
+export default async function ClubAdminResponses() {
+  await requireRole("club_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Responses</h1>
+          <SignOutButton loginPath="/club-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Approval outcomes and signatures will be shown here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/school-admin/classrooms/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Classrooms · School Admin" };
+
+export default async function SchoolAdminClassrooms() {
+  await requireRole("school_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Classrooms</h1>
+          <SignOutButton loginPath="/school-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Classroom list and availability view will be built here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/school-admin/clubs/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Clubs · School Admin" };
+
+export default async function SchoolAdminClubs() {
+  await requireRole("school_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Clubs</h1>
+          <SignOutButton loginPath="/school-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Club list and management will be built here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/school-admin/dashboard/page.tsx
+================================================
+import Link from "next/link";
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "School Admin Dashboard" };
+
+export default async function SchoolAdminDashboard() {
+  const profile = await requireRole("school_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              School Admin
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {profile.display_name}
+            </h1>
+          </div>
+          <SignOutButton loginPath="/school-admin/login" />
+        </header>
+
+        <section className="grid gap-4 sm:grid-cols-3">
+          <Link
+            href="/school-admin/requests"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">Pending requests</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              Review, accept, or reject classroom requests
+            </p>
+          </Link>
+          <Link
+            href="/school-admin/classrooms"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">Classrooms</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              View classroom list and availability
+            </p>
+          </Link>
+          <Link
+            href="/school-admin/clubs"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          >
+            <h2 className="font-medium">Clubs</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              View registered clubs
+            </p>
+          </Link>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/school-admin/login/page.tsx
+================================================
+import LoginForm from "@/components/login-form";
+
+export const metadata = { title: "School Admin Login" };
+
+export default function SchoolAdminLoginPage() {
+  return <LoginForm role="school_admin" />;
+}
+
+
+
+================================================
+FILE: app/school-admin/requests/page.tsx
+================================================
+import { requireRole } from "@/lib/auth";
+import SignOutButton from "@/components/sign-out-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Requests · School Admin" };
+
+export default async function SchoolAdminRequests() {
+  await requireRole("school_admin");
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Requests</h1>
+          <SignOutButton loginPath="/school-admin/login" />
+        </header>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Request list, detail view, and approve/reject actions will be built
+          here next.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: components/login-form.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+
+type Role = "school_admin" | "club_admin";
+
+const roleConfig: Record<
+  Role,
+  { title: string; subtitle: string; dashboard: string }
+> = {
+  school_admin: {
+    title: "School Admin Login",
+    subtitle: "Enter your credentials to access the admin panel",
+    dashboard: "/school-admin/dashboard",
+  },
+  club_admin: {
+    title: "Club Admin Login",
+    subtitle: "Enter your credentials to manage your club's bookings",
+    dashboard: "/club-admin/dashboard",
+  },
+};
+
+export default function LoginForm({ role }: { role: Role }) {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const config = roleConfig[role];
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const supabase = createClient();
+      const { data: signInData, error } = await supabase.auth.signInWithPassword(
+        {
+          email,
+          password,
+        }
+      );
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      // Verify the profile role matches this login page. Signing in through
+      // the wrong portal signs the user out with a clear error.
+      const userId = signInData.user?.id;
+      if (!userId) {
+        setError("Signed in, but no user was returned. Please try again.");
+        return;
+      }
+
+      const { data: profiles, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .limit(1);
+
+      if (profileError) {
+        setError(
+          `Could not verify your account role (${profileError.code ?? "unknown error"}): ${profileError.message}`
+        );
+        return;
+      }
+
+      const profileRole = profiles?.[0]?.role;
+      if (!profileRole) {
+        setError(
+          "No profile is linked to this account. Ask the school administrator to create your profile row in Supabase."
+        );
+        return;
+      }
+
+      if (profileRole !== role) {
+        await supabase.auth.signOut();
+        setError(
+          `This account is a ${profileRole === "school_admin" ? "school admin" : "club admin"} account. Please use the ${profileRole === "school_admin" ? "School Admin" : "Club Admin"} login.`
+        );
+        return;
+      }
+
+      router.replace(config.dashboard);
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Login failed. Check the Supabase environment configuration."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {config.title}
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            {config.subtitle}
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 space-y-4"
+        >
+          {error && (
+            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-sm font-medium">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+              placeholder="admin@school.edu"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="text-sm font-medium">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 pr-16 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 py-2 text-sm font-medium disabled:opacity-50"
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: components/sign-out-button.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+export default function SignOutButton({
+  loginPath,
+  label = "Sign out",
+}: {
+  loginPath: string;
+  label?: string;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  async function handleSignOut() {
+    setLoading(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace(loginPath);
+    router.refresh();
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleSignOut}
+      disabled={loading}
+      className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-50"
+    >
+      {loading ? "Signing out..." : label}
+    </button>
+  );
+}
+
+
+
+================================================
+FILE: lib/auth.ts
+================================================
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+export type UserRole = "school_admin" | "club_admin";
+
+export type Profile = {
+  id: string;
+  display_name: string;
+  role: UserRole;
+  club_id: string | null;
+};
+
+const loginPathByRole: Record<UserRole, string> = {
+  school_admin: "/school-admin/login",
+  club_admin: "/club-admin/login",
+};
+
+/**
+ * Loads the current authenticated user's profile and enforces the expected
+ * role. Unauthenticated users are sent to that role's login page; signed-in
+ * users with the wrong role (or no profile) are signed out and sent there too.
+ *
+ * This is server-side only. Database RLS remains the real authorization layer.
+ */
+export async function requireRole(role: UserRole): Promise<Profile> {
+  const supabase = await createClient();
+  const loginPath = loginPathByRole[role];
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(loginPath);
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, display_name, role, club_id")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== role) {
+    await supabase.auth.signOut();
+    redirect(loginPath);
+  }
+
+  return profile;
+}
+
+
+
+================================================
+FILE: lib/supabase/client.ts
+================================================
+import { createBrowserClient } from "@supabase/ssr";
+
+export function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabasePublishableKey) {
+    throw new Error(
+      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
+    );
+  }
+
+  return createBrowserClient(supabaseUrl, supabasePublishableKey);
+}
+
+
+
+================================================
+FILE: lib/supabase/server.ts
+================================================
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+export async function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabasePublishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabasePublishableKey) {
+    throw new Error(
+      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
+    );
+  }
+
+  const cookieStore = await cookies();
+
+  return createServerClient(supabaseUrl, supabasePublishableKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {
+          // Called from a Server Component: safe to ignore because the
+          // session-refreshing proxy handles cookie writes.
+        }
+      },
+    },
+  });
+}
+
+
