@@ -36,10 +36,12 @@ Directory structure:
     │       └── requests/
     │           └── page.tsx
     ├── components/
+    │   ├── classroom-grid.tsx
     │   ├── login-form.tsx
     │   └── sign-out-button.tsx
     └── lib/
         ├── auth.ts
+        ├── types.ts
         └── supabase/
             ├── client.ts
             └── server.ts
@@ -142,6 +144,7 @@ const nextConfig: NextConfig = {
   // this, Next.js blocks cross-origin dev resources (/_next/hmr) in dev.
   allowedDevOrigins: [
     "3000-7478235a-aa59-4311-815c-08edc6c3266e.daytonaproxy01.net",
+    "192.168.1.8",
   ],
 };
 
@@ -401,8 +404,11 @@ export default function Home() {
 ================================================
 FILE: app/club-admin/classrooms/page.tsx
 ================================================
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/sign-out-button";
+import ClassroomGrid from "@/components/classroom-grid";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Classrooms · Club Admin" };
@@ -410,16 +416,39 @@ export const metadata = { title: "Classrooms · Club Admin" };
 export default async function ClubAdminClassrooms() {
   await requireRole("club_admin");
 
+  const supabase = await createClient();
+  const { data: classrooms, error } = await supabase
+    .from("classrooms")
+    .select("id, class_name, grade, description, active, created_at")
+    .eq("active", true)
+    .order("grade")
+    .order("class_name");
+
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Classrooms</h1>
+          <div>
+            <Link
+              href="/club-admin/dashboard"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              ← Dashboard
+            </Link>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              Classrooms
+            </h1>
+          </div>
           <SignOutButton loginPath="/club-admin/login" />
         </header>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Availability picker and request creation will be built here next.
-        </p>
+
+        {error ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Failed to load classrooms: {error.message}
+          </p>
+        ) : (
+          <ClassroomGrid classrooms={classrooms ?? []} />
+        )}
       </div>
     </main>
   );
@@ -567,8 +596,11 @@ export default async function ClubAdminResponses() {
 ================================================
 FILE: app/school-admin/classrooms/page.tsx
 ================================================
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/sign-out-button";
+import ClassroomGrid from "@/components/classroom-grid";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Classrooms · School Admin" };
@@ -576,16 +608,38 @@ export const metadata = { title: "Classrooms · School Admin" };
 export default async function SchoolAdminClassrooms() {
   await requireRole("school_admin");
 
+  const supabase = await createClient();
+  const { data: classrooms, error } = await supabase
+    .from("classrooms")
+    .select("id, class_name, grade, description, active, created_at")
+    .order("grade")
+    .order("class_name");
+
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Classrooms</h1>
+          <div>
+            <Link
+              href="/school-admin/dashboard"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              ← Dashboard
+            </Link>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              Classrooms
+            </h1>
+          </div>
           <SignOutButton loginPath="/school-admin/login" />
         </header>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Classroom list and availability view will be built here next.
-        </p>
+
+        {error ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Failed to load classrooms: {error.message}
+          </p>
+        ) : (
+          <ClassroomGrid classrooms={classrooms ?? []} showInactive />
+        )}
       </div>
     </main>
   );
@@ -724,6 +778,92 @@ export default async function SchoolAdminRequests() {
         </p>
       </div>
     </main>
+  );
+}
+
+
+
+================================================
+FILE: components/classroom-grid.tsx
+================================================
+import type { Classroom } from "@/lib/types";
+
+const GRADE_ORDER = ["X", "XI", "XII"];
+
+/**
+ * Groups classrooms by grade and renders them as cards.
+ * Shared by the School Admin and Club Admin classroom pages.
+ */
+export default function ClassroomGrid({
+  classrooms,
+  showInactive = false,
+}: {
+  classrooms: Classroom[];
+  /** School Admin sees inactive rooms + descriptions; Club Admin sees active rooms only. */
+  showInactive?: boolean;
+}) {
+  const visible = showInactive
+    ? classrooms
+    : classrooms.filter((c) => c.active);
+
+  if (visible.length === 0) {
+    return (
+      <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+        No classrooms yet.
+      </p>
+    );
+  }
+
+  const byGrade = new Map<string, Classroom[]>();
+  for (const c of visible) {
+    const list = byGrade.get(c.grade) ?? [];
+    list.push(c);
+    byGrade.set(c.grade, list);
+  }
+
+  const grades = [...byGrade.keys()].sort(
+    (a, b) =>
+      GRADE_ORDER.indexOf(a) - GRADE_ORDER.indexOf(b) || a.localeCompare(b)
+  );
+
+  return (
+    <div className="space-y-8">
+      {grades.map((grade) => (
+        <section key={grade} className="space-y-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+            Grade {grade}
+            <span className="ml-2 font-normal normal-case">
+              {byGrade.get(grade)!.length} rooms
+            </span>
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {byGrade
+              .get(grade)!
+              .sort((a, b) => a.class_name.localeCompare(b.class_name))
+              .map((c) => (
+                <li
+                  key={c.id}
+                  className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium">{c.class_name}</p>
+                    {showInactive && !c.active && (
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                        inactive
+                      </span>
+                    )}
+                  </div>
+                  {showInactive && c.description && (
+                    <p className="mt-1 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
+                      {c.description}
+                    </p>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -1011,6 +1151,26 @@ export async function requireRole(role: UserRole): Promise<Profile> {
 
   return profile;
 }
+
+
+
+================================================
+FILE: lib/types.ts
+================================================
+export type Classroom = {
+  id: string;
+  class_name: string;
+  grade: string;
+  description: string | null;
+  active: boolean;
+  created_at: string;
+};
+
+export type Club = {
+  id: string;
+  name: string;
+  created_at: string;
+};
 
 
 
