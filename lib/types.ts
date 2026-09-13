@@ -12,3 +12,23 @@ export type Club = {
   name: string;
   created_at: string;
 };
+
+export type RequestStatus = "pending" | "accepted" | "rejected" | "cancelled";
+
+export type ClubRequestClassroom = {
+  classroom_id: string;
+  classrooms: Pick<Classroom, "id" | "class_name" | "grade">;
+};
+
+export type ClubRequest = {
+  id: string;
+  club_id: string;
+  usage_date: string;
+  start_time: string;
+  end_time: string;
+  reason: string;
+  status: RequestStatus;
+  created_at: string;
+  updated_at: string;
+  request_classrooms: ClubRequestClassroom[];
+};
