@@ -50,7 +50,7 @@ export default async function RequestDetailPage({
           </Link>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 p-6 dark:border-neutral-800">
+        <div className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h1 className="text-xl font-semibold tracking-tight">
               {r.clubs.name}

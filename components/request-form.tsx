@@ -32,12 +32,11 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Re-check classroom availability whenever date/time changes.
+  const timeRangeValid =
+    !!usageDate && !!startTime && !!endTime && startTime < endTime;
+
   useEffect(() => {
-    if (!usageDate || !startTime || !endTime || startTime >= endTime) {
-      setUnavailableIds(new Set());
-      return;
-    }
+    if (!timeRangeValid) return;
 
     let cancelled = false;
     setCheckingAvailability(true);
@@ -58,14 +57,13 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms.filter((c) => !availableIds.has(c.id)).map((c) => c.id)
         );
         setUnavailableIds(unavailable);
-        // Drop any already-selected classroom that just became unavailable.
         setClassroomIds((prev) => prev.filter((id) => !unavailable.has(id)));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [usageDate, startTime, endTime, classrooms]);
+  }, [timeRangeValid, usageDate, startTime, endTime, classrooms]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -174,7 +172,7 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms={classrooms}
           selectedIds={classroomIds}
           onChange={setClassroomIds}
-          unavailableIds={unavailableIds}
+          unavailableIds={timeRangeValid ? unavailableIds : new Set()}
         />
       </div>
 

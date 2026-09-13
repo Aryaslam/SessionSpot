@@ -55,7 +55,7 @@ export default function ClassroomGrid({
               .map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
+                  className="rounded-xl border border-neutral-200/70 bg-white p-4 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-medium">{c.class_name}</p>
