@@ -1,37 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-
+import { dictionaries } from "@/lib/i18n";
 
 type Role = "school_admin" | "club_admin";
+type LoginDict = (typeof dictionaries)["en"]["login"];
 
-const roleConfig: Record<
-  Role,
-  { title: string; subtitle: string; dashboard: string }
-> = {
+const roleMeta: Record<Role, { dashboard: string; crossPortalHref: string }> = {
   school_admin: {
-    title: "School Admin Login",
-    subtitle: "Enter your credentials to access the admin panel",
     dashboard: "/school-admin/dashboard",
+    crossPortalHref: "/club-admin/login",
   },
   club_admin: {
-    title: "Club Admin Login",
-    subtitle: "Enter your credentials to manage your club's bookings",
     dashboard: "/club-admin/dashboard",
+    crossPortalHref: "/school-admin/login",
   },
 };
 
-export default function LoginForm({ role }: { role: Role }) {
+export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const config = roleConfig[role];
+  const meta = roleMeta[role];
+  const title = role === "school_admin" ? t.schoolTitle : t.clubTitle;
+  const subtitle = role === "school_admin" ? t.schoolSubtitle : t.clubSubtitle;
+  const crossPortalLabel = role === "school_admin" ? t.tryClub : t.trySchool;
+
+  const status = searchParams.get("status");
+  const removalReason = searchParams.get("reason");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,20 +50,16 @@ export default function LoginForm({ role }: { role: Role }) {
 
     try {
       const supabase = createClient();
-      const { data: signInData, error } = await supabase.auth.signInWithPassword(
-        {
-          email,
-          password,
-        }
-      );
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
         setError(error.message);
         return;
       }
 
-      // Verify the profile role matches this login page. Signing in through
-      // the wrong portal signs the user out with a clear error.
       const userId = signInData.user?.id;
       if (!userId) {
         setError("Signed in, but no user was returned. Please try again.");
@@ -95,7 +95,7 @@ export default function LoginForm({ role }: { role: Role }) {
         return;
       }
 
-      router.replace(config.dashboard);
+      router.replace(meta.dashboard);
       router.refresh();
     } catch (err) {
       setError(
@@ -111,18 +111,35 @@ export default function LoginForm({ role }: { role: Role }) {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        <Link
+          href="/"
+          className="mb-4 inline-block text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+        >
+          {t.back}
+        </Link>
+
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {config.title}
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            {config.subtitle}
+            {subtitle}
           </p>
         </div>
 
+        {status === "pending" && (
+          <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
+            Your account is awaiting school admin approval.
+          </div>
+        )}
+        {status === "removed" && (
+          <div className="mb-4 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+            Account has been removed due to: {removalReason ?? "No reason given"}
+            . Please contact your school admin.
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 space-y-4"
+          className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6 space-y-4"
         >
           {error && (
             <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
@@ -132,7 +149,7 @@ export default function LoginForm({ role }: { role: Role }) {
 
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t.email}
             </label>
             <input
               id="email"
@@ -147,7 +164,7 @@ export default function LoginForm({ role }: { role: Role }) {
 
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t.password}
             </label>
             <div className="relative">
               <input
@@ -164,7 +181,7 @@ export default function LoginForm({ role }: { role: Role }) {
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? t.hide : t.show}
               </button>
             </div>
           </div>
@@ -174,9 +191,25 @@ export default function LoginForm({ role }: { role: Role }) {
             disabled={loading}
             className="w-full rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 py-2 text-sm font-medium disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t.signingIn : t.signIn}
           </button>
         </form>
+
+        <Link
+          href={meta.crossPortalHref}
+          className="mt-4 block text-center text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+        >
+          {crossPortalLabel}
+        </Link>
+
+        {role === "club_admin" && (
+          <Link
+            href="/club-admin/register"
+            className="mt-2 block text-center text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+          >
+            Don&apos;t have an account? Register
+          </Link>
+        )}
       </div>
     </main>
   );

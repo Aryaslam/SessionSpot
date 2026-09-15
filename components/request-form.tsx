@@ -16,28 +16,35 @@ type Props = {
     endTime: string;
     reason: string;
   };
+  initialDate?: string;
+  initialClassroomId?: string;
 };
 
-export default function RequestForm({ classrooms, requestId, initial }: Props) {
+export default function RequestForm({
+  classrooms,
+  requestId,
+  initial,
+  initialDate,
+  initialClassroomId,
+}: Props) {
   const router = useRouter();
   const [classroomIds, setClassroomIds] = useState<string[]>(
-    initial?.classroomIds ?? []
+    initial?.classroomIds ?? (initialClassroomId ? [initialClassroomId] : [])
   );
   const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? "");
+  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? initialDate ?? "");
   const [startTime, setStartTime] = useState(initial?.startTime ?? "");
   const [endTime, setEndTime] = useState(initial?.endTime ?? "");
   const [reason, setReason] = useState(initial?.reason ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Re-check classroom availability whenever date/time changes.
+  const timeRangeValid =
+    !!usageDate && !!startTime && !!endTime && startTime < endTime;
+
   useEffect(() => {
-    if (!usageDate || !startTime || !endTime || startTime >= endTime) {
-      setUnavailableIds(new Set());
-      return;
-    }
+    if (!timeRangeValid) return;
 
     let cancelled = false;
     setCheckingAvailability(true);
@@ -58,14 +65,13 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms.filter((c) => !availableIds.has(c.id)).map((c) => c.id)
         );
         setUnavailableIds(unavailable);
-        // Drop any already-selected classroom that just became unavailable.
         setClassroomIds((prev) => prev.filter((id) => !unavailable.has(id)));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [usageDate, startTime, endTime, classrooms]);
+  }, [timeRangeValid, usageDate, startTime, endTime, classrooms]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -174,7 +180,7 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms={classrooms}
           selectedIds={classroomIds}
           onChange={setClassroomIds}
-          unavailableIds={unavailableIds}
+          unavailableIds={timeRangeValid ? unavailableIds : new Set()}
         />
       </div>
 

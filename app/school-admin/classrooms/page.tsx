@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/sign-out-button";
-import ClassroomGrid from "@/components/classroom-grid";
+import ClassroomManager from "@/components/classroom-manager";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Classrooms · School Admin" };
@@ -40,7 +40,7 @@ export default async function SchoolAdminClassrooms() {
             Failed to load classrooms: {error.message}
           </p>
         ) : (
-          <ClassroomGrid classrooms={classrooms ?? []} showInactive />
+          <ClassroomManager classrooms={classrooms ?? []} />
         )}
       </div>
     </main>
