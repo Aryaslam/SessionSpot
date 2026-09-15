@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { dictionaries } from "@/lib/i18n";
+import type { LoginDict } from "@/lib/i18n";
 
 type Role = "school_admin" | "club_admin";
-type LoginDict = (typeof dictionaries)["en"]["login"];
 
 const roleMeta: Record<Role, { dashboard: string; crossPortalHref: string }> = {
   school_admin: {

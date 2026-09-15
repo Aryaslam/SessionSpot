@@ -2,7 +2,64 @@ import { cookies } from "next/headers";
 
 export type Locale = "en" | "id";
 
-export const dictionaries = {
+export interface HomeDict {
+  title: string;
+  subtitle: string;
+  schoolAdmin: string;
+  clubAdmin: string;
+}
+
+export interface LoginDict {
+  schoolTitle: string;
+  schoolSubtitle: string;
+  clubTitle: string;
+  clubSubtitle: string;
+  email: string;
+  password: string;
+  show: string;
+  hide: string;
+  signIn: string;
+  signingIn: string;
+  back: string;
+  tryClub: string;
+  trySchool: string;
+}
+
+export interface SettingsDict {
+  title: string;
+  theme: string;
+  light: string;
+  dark: string;
+  language: string;
+  back: string;
+}
+
+export interface DashboardDict {
+  schoolAdminLabel: string;
+  clubAdminLabel: string;
+  pendingTitle: string;
+  pendingDesc: string;
+  classroomsTitle: string;
+  classroomsDescSchool: string;
+  classroomsDescClub: string;
+  clubsTitle: string;
+  clubsDesc: string;
+  myRequestsTitle: string;
+  myRequestsDesc: string;
+  responsesTitle: string;
+  responsesDesc: string;
+  settingsLabel: string;
+  signOut: string;
+}
+
+interface Dictionary {
+  home: HomeDict;
+  login: LoginDict;
+  settings: SettingsDict;
+  dashboard: DashboardDict;
+}
+
+export const dictionaries: Record<Locale, Dictionary> = {
   en: {
     home: {
       title: "School Class Booking",
@@ -101,13 +158,13 @@ export const dictionaries = {
       signOut: "Keluar",
     },
   },
-} as const;
+};
 
 export async function getLocale(): Promise<Locale> {
   const cookieStore = await cookies();
   return cookieStore.get("locale")?.value === "id" ? "id" : "en";
 }
 
-export function getDictionary(locale: Locale) {
+export function getDictionary(locale: Locale): Dictionary {
   return dictionaries[locale];
 }
