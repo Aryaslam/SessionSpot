@@ -1,9 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { dictionaries } from "@/lib/i18n";
-
-type SettingsDict = (typeof dictionaries)["en"]["settings"];
+import type { SettingsDict } from "@/lib/i18n";
 
 export default function SettingsForm({
   theme,
