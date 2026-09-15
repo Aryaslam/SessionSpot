@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { dictionaries } from "@/lib/i18n";
@@ -22,6 +22,7 @@ const roleMeta: Record<Role, { dashboard: string; crossPortalHref: string }> = {
 
 export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +33,9 @@ export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
   const title = role === "school_admin" ? t.schoolTitle : t.clubTitle;
   const subtitle = role === "school_admin" ? t.schoolSubtitle : t.clubSubtitle;
   const crossPortalLabel = role === "school_admin" ? t.tryClub : t.trySchool;
+
+  const status = searchParams.get("status");
+  const removalReason = searchParams.get("reason");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -121,6 +125,18 @@ export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
           </p>
         </div>
 
+        {status === "pending" && (
+          <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
+            Your account is awaiting school admin approval.
+          </div>
+        )}
+        {status === "removed" && (
+          <div className="mb-4 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+            Account has been removed due to: {removalReason ?? "No reason given"}
+            . Please contact your school admin.
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6 space-y-4"
@@ -185,6 +201,15 @@ export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
         >
           {crossPortalLabel}
         </Link>
+
+        {role === "club_admin" && (
+          <Link
+            href="/club-admin/register"
+            className="mt-2 block text-center text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+          >
+            Don&apos;t have an account? Register
+          </Link>
+        )}
       </div>
     </main>
   );

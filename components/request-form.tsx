@@ -16,16 +16,24 @@ type Props = {
     endTime: string;
     reason: string;
   };
+  initialDate?: string;
+  initialClassroomId?: string;
 };
 
-export default function RequestForm({ classrooms, requestId, initial }: Props) {
+export default function RequestForm({
+  classrooms,
+  requestId,
+  initial,
+  initialDate,
+  initialClassroomId,
+}: Props) {
   const router = useRouter();
   const [classroomIds, setClassroomIds] = useState<string[]>(
-    initial?.classroomIds ?? []
+    initial?.classroomIds ?? (initialClassroomId ? [initialClassroomId] : [])
   );
   const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? "");
+  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? initialDate ?? "");
   const [startTime, setStartTime] = useState(initial?.startTime ?? "");
   const [endTime, setEndTime] = useState(initial?.endTime ?? "");
   const [reason, setReason] = useState(initial?.reason ?? "");

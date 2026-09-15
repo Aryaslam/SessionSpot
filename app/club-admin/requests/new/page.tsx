@@ -6,8 +6,13 @@ import RequestForm from "@/components/request-form";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "New request · Club Admin" };
 
-export default async function NewRequestPage() {
+export default async function NewRequestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string; classroom?: string }>;
+}) {
   await requireRole("club_admin");
+  const { date, classroom } = await searchParams;
   const supabase = await createClient();
 
   const { data: classrooms } = await supabase
@@ -31,7 +36,11 @@ export default async function NewRequestPage() {
             New request
           </h1>
         </div>
-        <RequestForm classrooms={classrooms ?? []} />
+        <RequestForm
+          classrooms={classrooms ?? []}
+          initialDate={date}
+          initialClassroomId={classroom}
+        />
       </div>
     </main>
   );

@@ -14,6 +14,20 @@ Directory structure:
     │   ├── layout.tsx
     │   ├── page.tsx
     │   ├── api/
+    │   │   ├── accounts/
+    │   │   │   └── [id]/
+    │   │   │       ├── reject/
+    │   │   │       │   └── route.ts
+    │   │   │       └── remove/
+    │   │   │           └── route.ts
+    │   │   ├── clubs/
+    │   │   │   ├── [clubId]/
+    │   │   │   │   ├── accounts/
+    │   │   │   │   │   └── route.ts
+    │   │   │   │   └── invite/
+    │   │   │   │       └── route.ts
+    │   │   │   └── public-list/
+    │   │   │       └── route.ts
     │   │   └── signature-url/
     │   │       └── route.ts
     │   ├── club-admin/
@@ -23,6 +37,8 @@ Directory structure:
     │   │   │   └── page.tsx
     │   │   ├── login/
     │   │   │   └── page.tsx
+    │   │   ├── register/
+    │   │   │   └── page.tsx
     │   │   ├── requests/
     │   │   │   ├── page.tsx
     │   │   │   ├── [id]/
@@ -30,7 +46,11 @@ Directory structure:
     │   │   │   │       └── page.tsx
     │   │   │   └── new/
     │   │   │       └── page.tsx
-    │   │   └── responses/
+    │   │   ├── responses/
+    │   │   │   └── page.tsx
+    │   │   ├── set-password/
+    │   │   │   └── page.tsx
+    │   │   └── settings/
     │   │       └── page.tsx
     │   └── school-admin/
     │       ├── classrooms/
@@ -41,21 +61,36 @@ Directory structure:
     │       │   └── page.tsx
     │       ├── login/
     │       │   └── page.tsx
-    │       └── requests/
-    │           ├── page.tsx
-    │           └── [id]/
-    │               └── page.tsx
+    │       ├── requests/
+    │       │   ├── page.tsx
+    │       │   └── [id]/
+    │       │       └── page.tsx
+    │       └── settings/
+    │           └── page.tsx
     ├── components/
     │   ├── approve-reject-form.tsx
     │   ├── cancel-request-button.tsx
+    │   ├── change-password-button.tsx
+    │   ├── classroom-calendar-modal.tsx
     │   ├── classroom-grid.tsx
+    │   ├── classroom-manager.tsx
     │   ├── classroom-select.tsx
+    │   ├── club-accounts-manager.tsx
+    │   ├── club-calendar.tsx
+    │   ├── club-detail-modal.tsx
+    │   ├── club-form.tsx
+    │   ├── club-manager.tsx
     │   ├── login-form.tsx
+    │   ├── pending-accounts-manager.tsx
+    │   ├── register-form.tsx
     │   ├── request-form.tsx
+    │   ├── set-password-form.tsx
+    │   ├── settings-form.tsx
     │   ├── sign-out-button.tsx
     │   └── view-signature-button.tsx
     └── lib/
         ├── auth.ts
+        ├── i18n.ts
         ├── types.ts
         └── supabase/
             ├── admin.ts
@@ -65,42 +100,10 @@ Directory structure:
 ================================================
 FILE: README.md
 ================================================
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SessionSpot
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## TODO/TO-FIX
+[x] Supabase's email rate limit when creating an account
 
 
 
@@ -156,12 +159,13 @@ FILE: next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // The Freebuff preview serves the dev server through a proxy host; without
-  // this, Next.js blocks cross-origin dev resources (/_next/hmr) in dev.
   allowedDevOrigins: [
     "3000-7478235a-aa59-4311-815c-08edc6c3266e.daytonaproxy01.net",
     "192.168.1.8",
+    "172.40.0.59",
+    "172.40.0.57"
   ],
+  devIndicators: false,
 };
 
 export default nextConfig;
@@ -311,9 +315,16 @@ FILE: app/globals.css
 ================================================
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #171717;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -321,13 +332,6 @@ FILE: app/globals.css
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -342,6 +346,7 @@ body {
 FILE: app/layout.tsx
 ================================================
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -360,15 +365,19 @@ export const metadata: Metadata = {
   description: "School classroom booking for clubs and school admins",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value === "dark" ? "dark" : "";
+  const locale = cookieStore.get("locale")?.value === "id" ? "id" : "en";
+
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={locale}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased ${theme}`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
@@ -381,18 +390,19 @@ export default function RootLayout({
 FILE: app/page.tsx
 ================================================
 import Link from "next/link";
+import { getDictionary, getLocale } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
+export default async function Home() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).home;
 
-export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
       <div className="w-full max-w-md text-center space-y-8">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            School Class Booking
-          </h1>
+          <h1 className="text-3xl font-semibold tracking-tight">{t.title}</h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            Request classrooms for your club, and let school administrators
-            review, approve, or reject them.
+            {t.subtitle}
           </p>
         </div>
 
@@ -401,18 +411,286 @@ export default function Home() {
             href="/school-admin/login"
             className="rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
           >
-            School Admin
+            {t.schoolAdmin}
           </Link>
           <Link
             href="/club-admin/login"
             className="rounded-md border border-neutral-300 dark:border-neutral-700 py-2.5 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
-            Club Admin
+            {t.clubAdmin}
           </Link>
         </div>
       </div>
     </main>
   );
+}
+
+
+
+================================================
+FILE: app/api/accounts/[id]/reject/route.ts
+================================================
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (callerProfile?.role !== "school_admin") {
+    return NextResponse.json(
+      { error: "Only school admins can reject accounts" },
+      { status: 403 }
+    );
+  }
+
+  const admin = createAdminClient();
+  await admin.from("profiles").delete().eq("id", id);
+  await admin.auth.admin.deleteUser(id);
+
+  return NextResponse.json({ ok: true });
+}
+
+
+
+================================================
+FILE: app/api/accounts/[id]/remove/route.ts
+================================================
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const { reason } = await req.json();
+
+  if (!reason || typeof reason !== "string" || !reason.trim()) {
+    return NextResponse.json({ error: "A reason is required" }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (callerProfile?.role !== "school_admin") {
+    return NextResponse.json(
+      { error: "Only school admins can remove accounts" },
+      { status: 403 }
+    );
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("profiles")
+    .update({ status: "removed", removal_reason: reason.trim() })
+    .eq("id", id);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+
+
+================================================
+FILE: app/api/clubs/[clubId]/accounts/route.ts
+================================================
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ clubId: string }> }
+) {
+  const { clubId } = await params;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (callerProfile?.role !== "school_admin") {
+    return NextResponse.json(
+      { error: "Only school admins can view accounts" },
+      { status: 403 }
+    );
+  }
+
+  const admin = createAdminClient();
+  const { data: profiles, error } = await admin
+    .from("profiles")
+    .select("id, display_name")
+    .eq("club_id", clubId)
+    .eq("role", "club_admin");
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const accounts = await Promise.all(
+    (profiles ?? []).map(async (p) => {
+      const { data } = await admin.auth.admin.getUserById(p.id);
+      return {
+        id: p.id,
+        display_name: p.display_name,
+        email: data.user?.email ?? "unknown",
+      };
+    })
+  );
+
+  return NextResponse.json({ accounts });
+}
+
+
+
+================================================
+FILE: app/api/clubs/[clubId]/invite/route.ts
+================================================
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const MAX_ACCOUNTS_PER_CLUB = 5;
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ clubId: string }> }
+) {
+  const { clubId } = await params;
+  const { email, displayName } = await req.json();
+
+  if (!email || typeof email !== "string") {
+    return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: callerProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (callerProfile?.role !== "school_admin") {
+    return NextResponse.json(
+      { error: "Only school admins can invite accounts" },
+      { status: 403 }
+    );
+  }
+
+  const admin = createAdminClient();
+
+  const { count, error: countError } = await admin
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("club_id", clubId);
+
+  if (countError) {
+    return NextResponse.json({ error: countError.message }, { status: 500 });
+  }
+  if ((count ?? 0) >= MAX_ACCOUNTS_PER_CLUB) {
+    return NextResponse.json(
+      { error: `This club already has the maximum of ${MAX_ACCOUNTS_PER_CLUB} accounts.` },
+      { status: 400 }
+    );
+  }
+
+  const redirectTo = `${new URL(req.url).origin}/club-admin/set-password`;
+  const { data: inviteData, error: inviteError } =
+    await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
+
+  if (inviteError || !inviteData.user) {
+    return NextResponse.json(
+      { error: inviteError?.message ?? "Failed to send invite" },
+      { status: 400 }
+    );
+  }
+
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: inviteData.user.id,
+    display_name: displayName?.trim() || email,
+    role: "club_admin",
+    club_id: clubId,
+  });
+
+  if (profileError) {
+    // Don't leave an orphaned auth user with no profile if this fails.
+    await admin.auth.admin.deleteUser(inviteData.user.id);
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, email });
+}
+
+
+
+================================================
+FILE: app/api/clubs/public-list/route.ts
+================================================
+import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+// Public, unauthenticated endpoint — only exposes id + name for the
+// registration form's club dropdown. No sensitive fields.
+export async function GET() {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("clubs")
+    .select("id, name")
+    .order("name");
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json({ clubs: data ?? [] });
 }
 
 
@@ -516,7 +794,7 @@ export default async function ClubAdminClassrooms() {
             Failed to load classrooms: {error.message}
           </p>
         ) : (
-          <ClassroomGrid classrooms={classrooms ?? []} />
+          <ClassroomGrid classrooms={classrooms ?? []} canRequest />
         )}
       </div>
     </main>
@@ -530,6 +808,7 @@ FILE: app/club-admin/dashboard/page.tsx
 ================================================
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { getDictionary, getLocale } from "@/lib/i18n";
 import SignOutButton from "@/components/sign-out-button";
 
 export const dynamic = "force-dynamic";
@@ -537,6 +816,8 @@ export const metadata = { title: "Club Admin Dashboard" };
 
 export default async function ClubAdminDashboard() {
   const profile = await requireRole("club_admin");
+  const locale = await getLocale();
+  const t = getDictionary(locale).dashboard;
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8">
@@ -544,41 +825,49 @@ export default async function ClubAdminDashboard() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Club Admin
+              {t.clubAdminLabel}
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">
               {profile.display_name}
             </h1>
           </div>
-          <SignOutButton loginPath="/club-admin/login" />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/club-admin/settings"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              {t.settingsLabel}
+            </Link>
+            <SignOutButton loginPath="/club-admin/login" label={t.signOut} />
+          </div>
         </header>
 
         <section className="grid gap-4 sm:grid-cols-3">
           <Link
             href="/club-admin/classrooms"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">Classrooms</h2>
+            <h2 className="font-medium">{t.classroomsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              Check availability and pick rooms
+              {t.classroomsDescClub}
             </p>
           </Link>
           <Link
             href="/club-admin/requests"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">My requests</h2>
+            <h2 className="font-medium">{t.myRequestsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              Create, edit, or cancel requests
+              {t.myRequestsDesc}
             </p>
           </Link>
           <Link
             href="/club-admin/responses"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">Responses</h2>
+            <h2 className="font-medium">{t.responsesTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              View accepted or rejected requests
+              {t.responsesDesc}
             </p>
           </Link>
         </section>
@@ -592,12 +881,35 @@ export default async function ClubAdminDashboard() {
 ================================================
 FILE: app/club-admin/login/page.tsx
 ================================================
+import { Suspense } from "react";
 import LoginForm from "@/components/login-form";
+import { getDictionary, getLocale } from "@/lib/i18n";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Club Admin Login" };
 
-export default function ClubAdminLoginPage() {
-  return <LoginForm role="club_admin" />;
+export default async function ClubAdminLoginPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).login;
+  return (
+    <Suspense>
+      <LoginForm role="club_admin" t={t} />
+    </Suspense>
+  );
+}
+
+
+
+================================================
+FILE: app/club-admin/register/page.tsx
+================================================
+import RegisterForm from "@/components/register-form";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Register · Club Admin" };
+
+export default function RegisterPage() {
+  return <RegisterForm />;
 }
 
 
@@ -804,8 +1116,13 @@ import RequestForm from "@/components/request-form";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "New request · Club Admin" };
 
-export default async function NewRequestPage() {
+export default async function NewRequestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string; classroom?: string }>;
+}) {
   await requireRole("club_admin");
+  const { date, classroom } = await searchParams;
   const supabase = await createClient();
 
   const { data: classrooms } = await supabase
@@ -829,7 +1146,11 @@ export default async function NewRequestPage() {
             New request
           </h1>
         </div>
-        <RequestForm classrooms={classrooms ?? []} />
+        <RequestForm
+          classrooms={classrooms ?? []}
+          initialDate={date}
+          initialClassroomId={classroom}
+        />
       </div>
     </main>
   );
@@ -973,13 +1294,74 @@ export default async function ClubAdminResponses() {
 
 
 ================================================
+FILE: app/club-admin/set-password/page.tsx
+================================================
+import SetPasswordForm from "@/components/set-password-form";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Set password" };
+
+export default function SetPasswordPage() {
+  return <SetPasswordForm />;
+}
+
+
+
+================================================
+FILE: app/club-admin/settings/page.tsx
+================================================
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { requireRole } from "@/lib/auth";
+import { getDictionary, type Locale } from "@/lib/i18n";
+import SignOutButton from "@/components/sign-out-button";
+import SettingsForm from "@/components/settings-form";
+import ChangePasswordButton from "@/components/change-password-button";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Settings · Club Admin" };
+
+export default async function ClubAdminSettings() {
+  await requireRole("club_admin");
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value === "dark" ? "dark" : "light";
+  const locale: Locale = cookieStore.get("locale")?.value === "id" ? "id" : "en";
+  const t = getDictionary(locale).settings;
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-md space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Link
+              href="/club-admin/dashboard"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              {t.back}
+            </Link>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              {t.title}
+            </h1>
+          </div>
+          <SignOutButton loginPath="/club-admin/login" />
+        </header>
+        <SettingsForm theme={theme} locale={locale} t={t} />
+        <ChangePasswordButton />
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
 FILE: app/school-admin/classrooms/page.tsx
 ================================================
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/sign-out-button";
-import ClassroomGrid from "@/components/classroom-grid";
+import ClassroomManager from "@/components/classroom-manager";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Classrooms · School Admin" };
@@ -1017,7 +1399,7 @@ export default async function SchoolAdminClassrooms() {
             Failed to load classrooms: {error.message}
           </p>
         ) : (
-          <ClassroomGrid classrooms={classrooms ?? []} showInactive />
+          <ClassroomManager classrooms={classrooms ?? []} />
         )}
       </div>
     </main>
@@ -1029,25 +1411,66 @@ export default async function SchoolAdminClassrooms() {
 ================================================
 FILE: app/school-admin/clubs/page.tsx
 ================================================
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/sign-out-button";
+import ClubManager from "@/components/club-manager";
+import PendingAccountsManager from "@/components/pending-accounts-manager";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Clubs · School Admin" };
 
 export default async function SchoolAdminClubs() {
   await requireRole("school_admin");
+  const supabase = await createClient();
+
+  const { data: clubs, error } = await supabase
+    .from("clubs")
+    .select(
+      "id, name, description, president_name, president_phone, vice_president_name, vice_president_phone, logo_path, created_at"
+    )
+    .order("name");
+
+  const { data: pending } = await supabase
+    .from("profiles")
+    .select("id, display_name, clubs(name)")
+    .eq("role", "club_admin")
+    .eq("status", "pending");
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Clubs</h1>
+          <div>
+            <Link
+              href="/school-admin/dashboard"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              ← Dashboard
+            </Link>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              Clubs
+            </h1>
+          </div>
           <SignOutButton loginPath="/school-admin/login" />
         </header>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Club list and management will be built here next.
-        </p>
+
+        <PendingAccountsManager
+          pending={(pending ?? []) as unknown as {
+            id: string;
+            display_name: string;
+            clubs: { name: string } | null;
+          }[]}
+        />
+
+        {error ? (
+          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Failed to load clubs: {error.message}
+          </p>
+        ) : (
+          <ClubManager clubs={clubs ?? []} />
+        )}
       </div>
     </main>
   );
@@ -1060,6 +1483,7 @@ FILE: app/school-admin/dashboard/page.tsx
 ================================================
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
+import { getDictionary, getLocale } from "@/lib/i18n";
 import SignOutButton from "@/components/sign-out-button";
 
 export const dynamic = "force-dynamic";
@@ -1067,6 +1491,8 @@ export const metadata = { title: "School Admin Dashboard" };
 
 export default async function SchoolAdminDashboard() {
   const profile = await requireRole("school_admin");
+  const locale = await getLocale();
+  const t = getDictionary(locale).dashboard;
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8">
@@ -1074,41 +1500,49 @@ export default async function SchoolAdminDashboard() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              School Admin
+              {t.schoolAdminLabel}
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">
               {profile.display_name}
             </h1>
           </div>
-          <SignOutButton loginPath="/school-admin/login" />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/school-admin/settings"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              {t.settingsLabel}
+            </Link>
+            <SignOutButton loginPath="/school-admin/login" label={t.signOut} />
+          </div>
         </header>
 
         <section className="grid gap-4 sm:grid-cols-3">
           <Link
             href="/school-admin/requests"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">Pending requests</h2>
+            <h2 className="font-medium">{t.pendingTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              Review, accept, or reject classroom requests
+              {t.pendingDesc}
             </p>
           </Link>
           <Link
             href="/school-admin/classrooms"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">Classrooms</h2>
+            <h2 className="font-medium">{t.classroomsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              View classroom list and availability
+              {t.classroomsDescSchool}
             </p>
           </Link>
           <Link
             href="/school-admin/clubs"
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">Clubs</h2>
+            <h2 className="font-medium">{t.clubsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-              View registered clubs
+              {t.clubsDesc}
             </p>
           </Link>
         </section>
@@ -1122,12 +1556,21 @@ export default async function SchoolAdminDashboard() {
 ================================================
 FILE: app/school-admin/login/page.tsx
 ================================================
+import { Suspense } from "react";
 import LoginForm from "@/components/login-form";
+import { getDictionary, getLocale } from "@/lib/i18n";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "School Admin Login" };
 
-export default function SchoolAdminLoginPage() {
-  return <LoginForm role="school_admin" />;
+export default async function SchoolAdminLoginPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).login;
+  return (
+    <Suspense>
+      <LoginForm role="school_admin" t={t} />
+    </Suspense>
+  );
 }
 
 
@@ -1342,7 +1785,7 @@ export default async function RequestDetailPage({
           </Link>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 p-6 dark:border-neutral-800">
+        <div className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h1 className="text-xl font-semibold tracking-tight">
               {r.clubs.name}
@@ -1392,6 +1835,51 @@ export default async function RequestDetailPage({
                       {r.status === "pending" && <ApproveRejectForm requestId={r.id} />}
           </dl>
         </div>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: app/school-admin/settings/page.tsx
+================================================
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { requireRole } from "@/lib/auth";
+import { getDictionary, type Locale } from "@/lib/i18n";
+import SignOutButton from "@/components/sign-out-button";
+import SettingsForm from "@/components/settings-form";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Settings · School Admin" };
+
+export default async function SchoolAdminSettings() {
+  await requireRole("school_admin");
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value === "dark" ? "dark" : "light";
+  const locale: Locale = cookieStore.get("locale")?.value === "id" ? "id" : "en";
+  const t = getDictionary(locale).settings;
+
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-md space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Link
+              href="/school-admin/dashboard"
+              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+            >
+              {t.back}
+            </Link>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+              {t.title}
+            </h1>
+          </div>
+          <SignOutButton loginPath="/school-admin/login" />
+        </header>
+        <SettingsForm theme={theme} locale={locale} t={t} />
       </div>
     </main>
   );
@@ -1600,31 +2088,301 @@ export default function CancelRequestButton({ requestId }: { requestId: string }
 
 
 ================================================
+FILE: components/change-password-button.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+export default function ChangePasswordButton() {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleClick() {
+    setError("");
+    setMessage("");
+    setLoading(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.email) {
+      setLoading(false);
+      setError("No email found on this account.");
+      return;
+    }
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      user.email,
+      { redirectTo: `${window.location.origin}/club-admin/set-password` }
+    );
+    setLoading(false);
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+    setMessage(`Verification email sent to ${user.email}.`);
+  }
+
+  return (
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={loading}
+        className="w-full rounded-md border border-neutral-300 py-2 text-sm font-medium disabled:opacity-50 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+      >
+        {loading ? "Sending..." : "Change password"}
+      </button>
+      {message && <p className="text-xs text-green-700 dark:text-green-400">{message}</p>}
+      {error && <p className="text-xs text-red-700 dark:text-red-400">{error}</p>}
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: components/classroom-calendar-modal.tsx
+================================================
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import type { Classroom } from "@/lib/types";
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function pad(n: number) {
+  return n.toString().padStart(2, "0");
+}
+function toDateString(y: number, m: number, d: number) {
+  return `${y}-${pad(m + 1)}-${pad(d)}`;
+}
+
+export default function ClassroomCalendarModal({
+  classroom,
+  canRequest,
+  onClose,
+}: {
+  classroom: Classroom;
+  canRequest: boolean;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [pickedDate, setPickedDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    const start = toDateString(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const end = toDateString(year, month, lastDay);
+
+    const supabase = createClient();
+    supabase
+      .rpc("classroom_booked_dates", {
+        p_classroom_id: classroom.id,
+        p_start_date: start,
+        p_end_date: end,
+      })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (error || !data) return;
+        setBookedDates(
+          new Set((data as { usage_date: string }[]).map((r) => r.usage_date))
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [classroom.id, year, month]);
+
+  function changeMonth(delta: number) {
+    setPickedDate(null);
+    let newMonth = month + delta;
+    let newYear = year;
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear -= 1;
+    } else if (newMonth > 11) {
+      newMonth = 0;
+      newYear += 1;
+    }
+    setMonth(newMonth);
+    setYear(newYear);
+  }
+
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstWeekday).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-sm rounded-xl border border-neutral-200/70 bg-white p-5 shadow-lg dark:border-neutral-800/70 dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold">
+            {classroom.class_name}
+            <span className="ml-2 font-normal text-neutral-400">
+              (Grade {classroom.grade})
+            </span>
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => changeMonth(-1)}
+            className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
+            ←
+          </button>
+          <p className="text-sm font-medium">
+            {MONTH_NAMES[month]} {year}
+          </p>
+          <button
+            type="button"
+            onClick={() => changeMonth(1)}
+            className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
+            →
+          </button>
+        </div>
+
+        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-neutral-400">
+          {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+            <div key={i}>{d}</div>
+          ))}
+        </div>
+
+        <div className="mt-1 grid grid-cols-7 gap-1">
+          {cells.map((day, i) => {
+            if (day === null) return <div key={i} />;
+            const dateStr = toDateString(year, month, day);
+            const booked = bookedDates.has(dateStr);
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => canRequest && setPickedDate(dateStr)}
+                disabled={!canRequest}
+                className={`flex aspect-square items-center justify-center rounded-full text-xs font-medium ${
+                  booked
+                    ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                    : "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
+                } ${canRequest ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+
+        {loading && (
+          <p className="mt-3 text-center text-xs text-neutral-400">
+            Loading availability…
+          </p>
+        )}
+
+        <div className="mt-4 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+          <span className="flex items-center gap-1">
+            <span className="h-3 w-3 rounded-full bg-green-100 dark:bg-green-950" />
+            Available
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-3 w-3 rounded-full bg-red-100 dark:bg-red-950" />
+            Booked
+          </span>
+        </div>
+      </div>
+
+      {pickedDate && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 px-4">
+          <div className="w-full max-w-xs rounded-xl border border-neutral-200/70 bg-white p-5 text-center shadow-lg dark:border-neutral-800/70 dark:bg-neutral-900">
+            <p className="text-sm font-medium">
+              Create a request on {pickedDate}?
+            </p>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/club-admin/requests/new?date=${pickedDate}&classroom=${classroom.id}`
+                  )
+                }
+                className="flex-1 rounded-md bg-neutral-900 py-2 text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setPickedDate(null)}
+                className="flex-1 rounded-md border border-neutral-300 py-2 text-sm font-medium dark:border-neutral-700"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================
 FILE: components/classroom-grid.tsx
 ================================================
+"use client";
+
+import { useState } from "react";
 import type { Classroom } from "@/lib/types";
+import ClassroomCalendarModal from "@/components/classroom-calendar-modal";
 
 const GRADE_ORDER = ["X", "XI", "XII"];
 
-/**
- * Groups classrooms by grade and renders them as cards.
- * Shared by the School Admin and Club Admin classroom pages.
- */
 export default function ClassroomGrid({
   classrooms,
   showInactive = false,
+  canRequest = false,
 }: {
   classrooms: Classroom[];
-  /** School Admin sees inactive rooms + descriptions; Club Admin sees active rooms only. */
   showInactive?: boolean;
+  canRequest?: boolean;
 }) {
+  const [selected, setSelected] = useState<Classroom | null>(null);
+
   const visible = showInactive
     ? classrooms
     : classrooms.filter((c) => c.active);
 
   if (visible.length === 0) {
     return (
-      <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+      <p className="rounded-xl border border-neutral-200/70 bg-white p-6 text-center text-sm text-neutral-500 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 dark:text-neutral-400">
         No classrooms yet.
       </p>
     );
@@ -1643,42 +2401,306 @@ export default function ClassroomGrid({
   );
 
   return (
-    <div className="space-y-8">
-      {grades.map((grade) => (
-        <section key={grade} className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-            Grade {grade}
-            <span className="ml-2 font-normal normal-case">
-              {byGrade.get(grade)!.length} rooms
-            </span>
-          </h2>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {byGrade
-              .get(grade)!
-              .sort((a, b) => a.class_name.localeCompare(b.class_name))
-              .map((c) => (
-                <li
-                  key={c.id}
-                  className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-medium">{c.class_name}</p>
-                    {showInactive && !c.active && (
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                        inactive
+    <>
+      <div className="space-y-8">
+        {grades.map((grade) => (
+          <section key={grade} className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+              Grade {grade}
+              <span className="ml-2 font-normal normal-case">
+                {byGrade.get(grade)!.length} rooms
+              </span>
+            </h2>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {byGrade
+                .get(grade)!
+                .sort((a, b) => a.class_name.localeCompare(b.class_name))
+                .map((c) => (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelected(c)}
+                      className="group relative w-full rounded-xl border border-neutral-200/70 bg-white p-4 text-left shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-medium">{c.class_name}</p>
+                        {showInactive && !c.active && (
+                          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                            inactive
+                          </span>
+                        )}
+                      </div>
+                      {showInactive && c.description && (
+                        <p className="mt-1 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
+                          {c.description}
+                        </p>
+                      )}
+                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-neutral-900/0 text-xs font-medium text-transparent transition-colors group-hover:bg-neutral-900/70 group-hover:text-white dark:group-hover:bg-neutral-100/80 dark:group-hover:text-neutral-900">
+                        View calendar
                       </span>
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      {selected && (
+        <ClassroomCalendarModal
+          classroom={selected}
+          canRequest={canRequest}
+          onClose={() => setSelected(null)}
+        />
+      )}
+    </>
+  );
+}
+
+
+
+================================================
+FILE: components/classroom-manager.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import ClassroomCalendarModal from "@/components/classroom-calendar-modal";
+import type { Classroom } from "@/lib/types";
+
+const GRADES = ["X", "XI", "XII"] as const;
+
+type FormState = {
+  id: string | null;
+  className: string;
+  grade: (typeof GRADES)[number];
+  description: string;
+};
+
+const emptyForm: FormState = { id: null, className: "", grade: "X", description: "" };
+
+export default function ClassroomManager({ classrooms }: { classrooms: Classroom[] }) {
+  const router = useRouter();
+  const [form, setForm] = useState<FormState | null>(null);
+  const [calendarClassroom, setCalendarClassroom] = useState<Classroom | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const byGrade = new Map<string, Classroom[]>();
+  for (const c of classrooms) {
+    const list = byGrade.get(c.grade) ?? [];
+    list.push(c);
+    byGrade.set(c.grade, list);
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form) return;
+    if (!form.className.trim()) {
+      setError("Class name cannot be empty.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+
+    const { error: dbError } = form.id
+      ? await supabase
+          .from("classrooms")
+          .update({
+            class_name: form.className.trim(),
+            grade: form.grade,
+            description: form.description.trim() || null,
+          })
+          .eq("id", form.id)
+      : await supabase.from("classrooms").insert({
+          class_name: form.className.trim(),
+          grade: form.grade,
+          description: form.description.trim() || null,
+        });
+
+    setLoading(false);
+    if (dbError) {
+      setError(dbError.message);
+      return;
+    }
+    setForm(null);
+    router.refresh();
+  }
+
+  async function toggleActive(c: Classroom) {
+    setLoading(true);
+    const supabase = createClient();
+    const { error: dbError } = await supabase
+      .from("classrooms")
+      .update({ active: !c.active })
+      .eq("id", c.id);
+    setLoading(false);
+    if (dbError) {
+      alert(dbError.message);
+      return;
+    }
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setForm({ ...emptyForm })}
+          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
+        >
+          Add classroom
+        </button>
+      </div>
+
+      {form && (
+        <form
+          onSubmit={handleSave}
+          className="space-y-3 rounded-xl border border-neutral-200/70 bg-white p-4 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
+        >
+          {error && (
+            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </div>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Class name</label>
+              <input
+                value={form.className}
+                onChange={(e) => setForm({ ...form, className: e.target.value })}
+                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+                placeholder="X-13"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Grade</label>
+              <select
+                value={form.grade}
+                onChange={(e) =>
+                  setForm({ ...form, grade: e.target.value as FormState["grade"] })
+                }
+                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+              >
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">
+              Description <span className="font-normal text-neutral-400">(optional)</span>
+            </label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={2}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+            >
+              {loading ? "Saving..." : form.id ? "Save changes" : "Create"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setForm(null);
+                setError("");
+              }}
+              className="flex-1 rounded-md border border-neutral-300 py-2 text-sm font-medium dark:border-neutral-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
+      {GRADES.map((grade) => {
+        const list = byGrade.get(grade) ?? [];
+        if (list.length === 0) return null;
+        return (
+          <section key={grade} className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+              Grade {grade}
+              <span className="ml-2 font-normal normal-case">{list.length} rooms</span>
+            </h2>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {list
+                .sort((a, b) => a.class_name.localeCompare(b.class_name))
+                .map((c) => (
+                  <li
+                    key={c.id}
+                    className="rounded-xl border border-neutral-200/70 bg-white p-4 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCalendarClassroom(c)}
+                        className="font-medium hover:underline"
+                      >
+                        {c.class_name}
+                      </button>
+                      {!c.active && (
+                        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                          inactive
+                        </span>
+                      )}
+                    </div>
+                    {c.description && (
+                      <p className="mt-1 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
+                        {c.description}
+                      </p>
                     )}
-                  </div>
-                  {showInactive && c.description && (
-                    <p className="mt-1 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
-                      {c.description}
-                    </p>
-                  )}
-                </li>
-              ))}
-          </ul>
-        </section>
-      ))}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm({
+                            id: c.id,
+                            className: c.class_name,
+                            grade: c.grade as FormState["grade"],
+                            description: c.description ?? "",
+                          })
+                        }
+                        className="rounded-md border border-neutral-300 px-2.5 py-1 text-xs font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleActive(c)}
+                        disabled={loading}
+                        className="rounded-md border border-red-300 px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
+                      >
+                        {c.active ? "Deactivate" : "Activate"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        );
+      })}
+
+      {calendarClassroom && (
+        <ClassroomCalendarModal
+          classroom={calendarClassroom}
+          canRequest={false}
+          onClose={() => setCalendarClassroom(null)}
+        />
+      )}
     </div>
   );
 }
@@ -1766,42 +2788,854 @@ export default function ClassroomSelect({
 
 
 ================================================
-FILE: components/login-form.tsx
+FILE: components/club-accounts-manager.tsx
+================================================
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Account = { id: string; display_name: string; email: string };
+
+const MAX_ACCOUNTS = 5;
+
+export default function ClubAccountsManager({ clubId }: { clubId: string }) {
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [inviting, setInviting] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    const res = await fetch(`/api/clubs/${clubId}/accounts`);
+    const data = await res.json();
+    setLoading(false);
+    if (res.ok) setAccounts(data.accounts);
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clubId]);
+
+  async function handleInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!email.trim()) {
+      setError("Email is required.");
+      return;
+    }
+    setInviting(true);
+    const res = await fetch(`/api/clubs/${clubId}/invite`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim(), displayName: displayName.trim() }),
+    });
+    const data = await res.json();
+    setInviting(false);
+    if (!res.ok) {
+      setError(data.error ?? "Failed to send invite.");
+      return;
+    }
+    setSuccess(`Invite sent to ${email.trim()}.`);
+    setEmail("");
+    setDisplayName("");
+    load();
+  }
+
+  async function handleRemove(id: string) {
+    const reason = prompt("Reason for removing this account:");
+    if (!reason || !reason.trim()) return;
+    const res = await fetch(`/api/accounts/${id}/remove`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: reason.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error ?? "Failed to remove account.");
+      return;
+    }
+    load();
+  }
+
+  return (
+    <div className="space-y-3 rounded-xl border border-neutral-200/70 bg-white p-4 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900">
+      <p className="text-sm font-medium">
+        Connected accounts
+        <span className="ml-2 font-normal text-neutral-400">
+          {accounts.length}/{MAX_ACCOUNTS}
+        </span>
+      </p>
+
+      {loading ? (
+        <p className="text-sm text-neutral-400">Loading…</p>
+      ) : accounts.length === 0 ? (
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          No accounts connected yet.
+        </p>
+      ) : (
+        <ul className="space-y-1.5">
+          {accounts.map((a) => (
+            <li
+              key={a.id}
+              className="flex items-center justify-between gap-2 rounded-md border border-neutral-200/70 px-3 py-1.5 text-sm dark:border-neutral-800/70"
+            >
+              <div>
+                <p className="font-medium">{a.display_name}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{a.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemove(a.id)}
+                className="rounded-md border border-red-300 px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {error && (
+        <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="rounded-md border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-400">
+          {success}
+        </div>
+      )}
+
+      {accounts.length < MAX_ACCOUNTS && (
+        <form
+          onSubmit={handleInvite}
+          className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-800"
+        >
+          <p className="text-xs text-neutral-400">
+            Email invites require SMTP to be configured — self-registration via the
+            login page&apos;s Register link works without it.
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@email.com"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Name (optional)"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={inviting}
+            className="w-full rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+          >
+            {inviting ? "Sending invite..." : "Invite by email"}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: components/club-calendar.tsx
+================================================
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+type Booking = {
+  usage_date: string;
+  classroom_name: string;
+  start_time: string;
+  end_time: string;
+  reason: string;
+};
+
+function pad(n: number) {
+  return n.toString().padStart(2, "0");
+}
+function toDateString(y: number, m: number, d: number) {
+  return `${y}-${pad(m + 1)}-${pad(d)}`;
+}
+
+export default function ClubCalendar({ clubId }: { clubId: string }) {
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setSelectedDate(null);
+
+    const start = toDateString(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const end = toDateString(year, month, lastDay);
+
+    const supabase = createClient();
+    supabase
+      .rpc("club_booked_dates", {
+        p_club_id: clubId,
+        p_start_date: start,
+        p_end_date: end,
+      })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (error || !data) return;
+        setBookings(data as Booking[]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [clubId, year, month]);
+
+  function changeMonth(delta: number) {
+    let newMonth = month + delta;
+    let newYear = year;
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear -= 1;
+    } else if (newMonth > 11) {
+      newMonth = 0;
+      newYear += 1;
+    }
+    setMonth(newMonth);
+    setYear(newYear);
+  }
+
+  const bookedDates = new Set(bookings.map((b) => b.usage_date));
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstWeekday).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  const selectedBookings = selectedDate
+    ? bookings.filter((b) => b.usage_date === selectedDate)
+    : [];
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => changeMonth(-1)}
+          className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        >
+          ←
+        </button>
+        <p className="text-sm font-medium">
+          {MONTH_NAMES[month]} {year}
+        </p>
+        <button
+          type="button"
+          onClick={() => changeMonth(1)}
+          className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        >
+          →
+        </button>
+      </div>
+
+      <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-neutral-400">
+        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+          <div key={i}>{d}</div>
+        ))}
+      </div>
+
+      <div className="mt-1 grid grid-cols-7 gap-1">
+        {cells.map((day, i) => {
+          if (day === null) return <div key={i} />;
+          const dateStr = toDateString(year, month, day);
+          const booked = bookedDates.has(dateStr);
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => booked && setSelectedDate(dateStr)}
+              disabled={!booked}
+              className={`flex aspect-square items-center justify-center rounded-full text-xs font-medium ${
+                booked
+                  ? "cursor-pointer bg-green-100 text-green-700 hover:opacity-80 dark:bg-green-950 dark:text-green-300"
+                  : "text-neutral-400 dark:text-neutral-600"
+              }`}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+
+      {loading && (
+        <p className="mt-3 text-center text-xs text-neutral-400">Loading…</p>
+      )}
+
+      {selectedDate && selectedBookings.length > 0 && (
+        <div className="mt-4 space-y-2 rounded-lg border border-neutral-200/70 bg-neutral-50 p-3 dark:border-neutral-800/70 dark:bg-neutral-800">
+          <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+            {selectedDate}
+          </p>
+          {selectedBookings.map((b, i) => (
+            <div key={i} className="text-sm">
+              <p className="font-medium">
+                {b.classroom_name} · {b.start_time.slice(0, 5)}–
+                {b.end_time.slice(0, 5)}
+              </p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {b.reason}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: components/club-detail-modal.tsx
+================================================
+"use client";
+
+import { useEffect } from "react";
+import type { Club } from "@/lib/types";
+import ClubCalendar from "@/components/club-calendar";
+
+function logoUrl(path: string | null) {
+  if (!path) return null;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return `${base}/storage/v1/object/public/club-logos/${path}`;
+}
+
+export default function ClubDetailModal({
+  club,
+  onClose,
+  onEdit,
+}: {
+  club: Club;
+  onClose: () => void;
+  onEdit: () => void;
+}) {
+  const logo = logoUrl(club.logo_path);
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8">
+      <div className="flex max-h-full w-full max-w-md flex-col rounded-xl border border-neutral-200/70 bg-white shadow-lg dark:border-neutral-800/70 dark:bg-neutral-900">
+        <div className="flex shrink-0 items-start justify-between border-b border-neutral-200/70 p-5 dark:border-neutral-800/70">
+          <div className="flex items-center gap-3">
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logo}
+                alt={club.name}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-lg font-semibold text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                {club.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <h2 className="text-lg font-semibold tracking-tight">{club.name}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-5">
+          {club.description && (
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {club.description}
+            </p>
+          )}
+
+          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">President</p>
+              <p className="font-medium">{club.president_name ?? "—"}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {club.president_phone ?? ""}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Vice President</p>
+              <p className="font-medium">{club.vice_president_name ?? "—"}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {club.vice_president_phone ?? ""}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-neutral-200 pt-4 dark:border-neutral-800">
+            <p className="mb-2 text-sm font-medium">Bookings</p>
+            <ClubCalendar clubId={club.id} />
+          </div>
+        </div>
+
+        <div className="shrink-0 border-t border-neutral-200/70 p-5 dark:border-neutral-800/70">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="w-full rounded-md border border-neutral-300 py-2 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+          >
+            Edit club
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: components/club-form.tsx
 ================================================
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import ClubAccountsManager from "@/components/club-accounts-manager";
+import type { Club } from "@/lib/types";
 
+type Props = {
+  club: Club | null;
+  onDone: () => void;
+};
+
+export default function ClubForm({ club, onDone }: Props) {
+  const router = useRouter();
+  const [name, setName] = useState(club?.name ?? "");
+  const [description, setDescription] = useState(club?.description ?? "");
+  const [presidentName, setPresidentName] = useState(club?.president_name ?? "");
+  const [presidentPhone, setPresidentPhone] = useState(club?.president_phone ?? "");
+  const [vicePresidentName, setVicePresidentName] = useState(
+    club?.vice_president_name ?? ""
+  );
+  const [vicePresidentPhone, setVicePresidentPhone] = useState(
+    club?.vice_president_phone ?? ""
+  );
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminDisplayName, setAdminDisplayName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [createdClubId, setCreatedClubId] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError("Club name cannot be empty.");
+      return;
+    }
+    if (!club && !adminEmail.trim()) {
+      setError("At least one account email is required when registering a club.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+
+    try {
+      let logoPath = club?.logo_path ?? null;
+      if (logoFile) {
+        const ext = logoFile.name.split(".").pop() ?? "png";
+        const path = `${name.trim().toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("club-logos")
+          .upload(path, logoFile);
+        if (uploadError) throw new Error(`Logo upload failed: ${uploadError.message}`);
+        logoPath = path;
+      }
+
+      const payload = {
+        name: name.trim(),
+        description: description.trim() || null,
+        president_name: presidentName.trim() || null,
+        president_phone: presidentPhone.trim() || null,
+        vice_president_name: vicePresidentName.trim() || null,
+        vice_president_phone: vicePresidentPhone.trim() || null,
+        logo_path: logoPath,
+      };
+
+      if (club) {
+        const { error: dbError } = await supabase
+          .from("clubs")
+          .update(payload)
+          .eq("id", club.id);
+        if (dbError) throw new Error(dbError.message);
+        router.refresh();
+        onDone();
+        return;
+      }
+
+      const { data: newClub, error: dbError } = await supabase
+        .from("clubs")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (dbError) throw new Error(dbError.message);
+
+      const res = await fetch(`/api/clubs/${newClub.id}/invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: adminEmail.trim(),
+          displayName: adminDisplayName.trim(),
+        }),
+      });
+      const inviteResult = await res.json();
+
+      router.refresh();
+
+      if (!res.ok) {
+        // Club row is already saved — let them retry the invite here
+        // instead of losing everything they just filled in.
+        setError(`Club created, but the invite failed: ${inviteResult.error}`);
+        setCreatedClubId(newClub.id);
+        return;
+      }
+
+      onDone();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (createdClubId) {
+    return (
+      <div className="space-y-3">
+        {error && (
+          <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+            {error}
+          </div>
+        )}
+        <ClubAccountsManager clubId={createdClubId} />
+        <button
+          type="button"
+          onClick={onDone}
+          className="w-full rounded-md border border-neutral-300 py-2 text-sm font-medium dark:border-neutral-700"
+        >
+          Done
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 rounded-xl border border-neutral-200/70 bg-white p-4 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
+    >
+      {error && (
+        <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium">Club name</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium">
+          Description <span className="font-normal text-neutral-400">(optional)</span>
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={2}
+          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">President name</label>
+          <input
+            value={presidentName}
+            onChange={(e) => setPresidentName(e.target.value)}
+            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">President phone</label>
+          <input
+            value={presidentPhone}
+            onChange={(e) => setPresidentPhone(e.target.value)}
+            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Vice president name</label>
+          <input
+            value={vicePresidentName}
+            onChange={(e) => setVicePresidentName(e.target.value)}
+            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Vice president phone</label>
+          <input
+            value={vicePresidentPhone}
+            onChange={(e) => setVicePresidentPhone(e.target.value)}
+            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium">
+          Logo <span className="font-normal text-neutral-400">(optional)</span>
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setLogoFile(e.target.files?.[0] ?? null)}
+          className="w-full text-sm"
+        />
+      </div>
+
+      {!club && (
+        <div className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+          <p className="text-sm font-medium">Account to log in with</p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input
+              type="email"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              placeholder="admin@email.com"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+            <input
+              value={adminDisplayName}
+              onChange={(e) => setAdminDisplayName(e.target.value)}
+              placeholder="Name (optional)"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+          <p className="text-xs text-neutral-400">
+            A verification email is sent to set up their own password — you never see or set it.
+          </p>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+        >
+          {loading ? "Saving..." : club ? "Save changes" : "Register club"}
+        </button>
+        <button
+          type="button"
+          onClick={onDone}
+          disabled={loading}
+          className="flex-1 rounded-md border border-neutral-300 py-2 text-sm font-medium dark:border-neutral-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+
+
+================================================
+FILE: components/club-manager.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import type { Club } from "@/lib/types";
+import ClubDetailModal from "@/components/club-detail-modal";
+import ClubForm from "@/components/club-form";
+import ClubAccountsManager from "@/components/club-accounts-manager";
+
+function logoUrl(path: string | null) {
+  if (!path) return null;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return `${base}/storage/v1/object/public/club-logos/${path}`;
+}
+
+export default function ClubManager({ clubs }: { clubs: Club[] }) {
+  const [selected, setSelected] = useState<Club | null>(null);
+  const [editing, setEditing] = useState<Club | null | "new">(null);
+
+  if (editing !== null) {
+    return (
+      <div className="space-y-4">
+        <ClubForm
+          club={editing === "new" ? null : editing}
+          onDone={() => setEditing(null)}
+        />
+        {editing !== "new" && <ClubAccountsManager clubId={editing.id} />}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setEditing("new")}
+          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
+        >
+          Register club
+        </button>
+      </div>
+
+      {clubs.length === 0 ? (
+        <p className="rounded-xl border border-neutral-200/70 bg-white p-6 text-center text-sm text-neutral-500 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 dark:text-neutral-400">
+          No clubs yet.
+        </p>
+      ) : (
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {clubs.map((c) => {
+            const logo = logoUrl(c.logo_path);
+            return (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => setSelected(c)}
+                  className="group relative w-full rounded-xl border border-neutral-200/70 bg-white p-4 text-left shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+                >
+                  <div className="flex items-center gap-3">
+                    {logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={logo}
+                        alt={c.name}
+                        className="h-12 w-12 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-sm font-semibold text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                        {c.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <p className="font-medium">{c.name}</p>
+                  </div>
+                  {c.description && (
+                    <p className="mt-3 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
+                      {c.description}
+                    </p>
+                  )}
+                  <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-neutral-900/0 text-xs font-medium text-transparent transition-colors group-hover:bg-neutral-900/70 group-hover:text-white dark:group-hover:bg-neutral-100/80 dark:group-hover:text-neutral-900">
+                    View club details
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {selected && (
+        <ClubDetailModal
+          club={selected}
+          onClose={() => setSelected(null)}
+          onEdit={() => {
+            setEditing(selected);
+            setSelected(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+
+
+================================================
+FILE: components/login-form.tsx
+================================================
+"use client";
+
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { dictionaries } from "@/lib/i18n";
 
 type Role = "school_admin" | "club_admin";
+type LoginDict = (typeof dictionaries)["en"]["login"];
 
-const roleConfig: Record<
-  Role,
-  { title: string; subtitle: string; dashboard: string }
-> = {
+const roleMeta: Record<Role, { dashboard: string; crossPortalHref: string }> = {
   school_admin: {
-    title: "School Admin Login",
-    subtitle: "Enter your credentials to access the admin panel",
     dashboard: "/school-admin/dashboard",
+    crossPortalHref: "/club-admin/login",
   },
   club_admin: {
-    title: "Club Admin Login",
-    subtitle: "Enter your credentials to manage your club's bookings",
     dashboard: "/club-admin/dashboard",
+    crossPortalHref: "/school-admin/login",
   },
 };
 
-export default function LoginForm({ role }: { role: Role }) {
+export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const config = roleConfig[role];
+  const meta = roleMeta[role];
+  const title = role === "school_admin" ? t.schoolTitle : t.clubTitle;
+  const subtitle = role === "school_admin" ? t.schoolSubtitle : t.clubSubtitle;
+  const crossPortalLabel = role === "school_admin" ? t.tryClub : t.trySchool;
+
+  const status = searchParams.get("status");
+  const removalReason = searchParams.get("reason");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1816,20 +3650,16 @@ export default function LoginForm({ role }: { role: Role }) {
 
     try {
       const supabase = createClient();
-      const { data: signInData, error } = await supabase.auth.signInWithPassword(
-        {
-          email,
-          password,
-        }
-      );
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
         setError(error.message);
         return;
       }
 
-      // Verify the profile role matches this login page. Signing in through
-      // the wrong portal signs the user out with a clear error.
       const userId = signInData.user?.id;
       if (!userId) {
         setError("Signed in, but no user was returned. Please try again.");
@@ -1865,7 +3695,7 @@ export default function LoginForm({ role }: { role: Role }) {
         return;
       }
 
-      router.replace(config.dashboard);
+      router.replace(meta.dashboard);
       router.refresh();
     } catch (err) {
       setError(
@@ -1881,18 +3711,35 @@ export default function LoginForm({ role }: { role: Role }) {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        <Link
+          href="/"
+          className="mb-4 inline-block text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+        >
+          {t.back}
+        </Link>
+
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {config.title}
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            {config.subtitle}
+            {subtitle}
           </p>
         </div>
 
+        {status === "pending" && (
+          <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300">
+            Your account is awaiting school admin approval.
+          </div>
+        )}
+        {status === "removed" && (
+          <div className="mb-4 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+            Account has been removed due to: {removalReason ?? "No reason given"}
+            . Please contact your school admin.
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 space-y-4"
+          className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6 space-y-4"
         >
           {error && (
             <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
@@ -1902,7 +3749,7 @@ export default function LoginForm({ role }: { role: Role }) {
 
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              {t.email}
             </label>
             <input
               id="email"
@@ -1917,7 +3764,7 @@ export default function LoginForm({ role }: { role: Role }) {
 
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t.password}
             </label>
             <div className="relative">
               <input
@@ -1934,7 +3781,7 @@ export default function LoginForm({ role }: { role: Role }) {
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? t.hide : t.show}
               </button>
             </div>
           </div>
@@ -1944,7 +3791,314 @@ export default function LoginForm({ role }: { role: Role }) {
             disabled={loading}
             className="w-full rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 py-2 text-sm font-medium disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t.signingIn : t.signIn}
+          </button>
+        </form>
+
+        <Link
+          href={meta.crossPortalHref}
+          className="mt-4 block text-center text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+        >
+          {crossPortalLabel}
+        </Link>
+
+        {role === "club_admin" && (
+          <Link
+            href="/club-admin/register"
+            className="mt-2 block text-center text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+          >
+            Don&apos;t have an account? Register
+          </Link>
+        )}
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: components/pending-accounts-manager.tsx
+================================================
+"use client";
+
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+type PendingAccount = {
+  id: string;
+  display_name: string;
+  clubs: { name: string } | null;
+};
+
+export default function PendingAccountsManager({
+  pending,
+}: {
+  pending: PendingAccount[];
+}) {
+  const router = useRouter();
+
+  async function handleAccept(id: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({ status: "active" })
+      .eq("id", id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    router.refresh();
+  }
+
+  async function handleReject(id: string) {
+    if (!confirm("Reject and delete this registration request?")) return;
+    const res = await fetch(`/api/accounts/${id}/reject`, { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error ?? "Failed to reject.");
+      return;
+    }
+    router.refresh();
+  }
+
+  if (pending.length === 0) return null;
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+        Pending account requests ({pending.length})
+      </h2>
+      <ul className="space-y-2">
+        {pending.map((p) => (
+          <li
+            key={p.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950"
+          >
+            <div>
+              <p className="text-sm font-medium">{p.display_name}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {p.clubs?.name ?? "Unknown club"}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleAccept(p.id)}
+                className="rounded-md bg-green-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-800"
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                onClick={() => handleReject(p.id)}
+                className="rounded-md bg-red-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-800"
+              >
+                Reject
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+
+
+================================================
+FILE: components/register-form.tsx
+================================================
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+
+type ClubOption = { id: string; name: string };
+
+export default function RegisterForm() {
+  const [clubs, setClubs] = useState<ClubOption[]>([]);
+  const [clubId, setClubId] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/clubs/public-list")
+      .then((res) => res.json())
+      .then((data) => setClubs(data.clubs ?? []));
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!displayName.trim() || !email.trim() || !clubId) {
+      setError("All fields are required.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+    });
+
+    if (signUpError || !signUpData.user) {
+      setLoading(false);
+      setError(signUpError?.message ?? "Registration failed.");
+      return;
+    }
+
+    if (!signUpData.session) {
+      setLoading(false);
+      setError(
+        "Registration succeeded but no session was returned. Email confirmation may still be enabled — contact the school admin."
+      );
+      return;
+    }
+
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: signUpData.user.id,
+      display_name: displayName.trim(),
+      role: "club_admin",
+      club_id: clubId,
+      status: "pending",
+    });
+
+    if (profileError) {
+      setLoading(false);
+      setError(profileError.message);
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setLoading(false);
+    setSubmitted(true);
+  }
+
+  if (submitted) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-sm rounded-xl border border-neutral-200/70 bg-white p-6 text-center shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900">
+          <h1 className="text-lg font-semibold">Registration submitted</h1>
+          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+            Your account is waiting for school admin approval. You&apos;ll be
+            able to log in once it&apos;s accepted.
+          </p>
+          <Link
+            href="/club-admin/login"
+            className="mt-4 inline-block text-sm text-neutral-600 hover:underline dark:text-neutral-300"
+          >
+            Back to login
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <Link
+          href="/club-admin/login"
+          className="mb-4 inline-block text-sm text-neutral-500 hover:underline dark:text-neutral-400"
+        >
+          ← Back to login
+        </Link>
+
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Register Club Admin Account
+          </h1>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-xl border border-neutral-200/70 bg-white p-6 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
+        >
+          {error && (
+            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Club</label>
+            <select
+              value={clubId}
+              onChange={(e) => setClubId(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            >
+              <option value="">Select a club</option>
+              {clubs.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Username</label>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Confirm password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+          >
+            {loading ? "Submitting..." : "Register"}
           </button>
         </form>
       </div>
@@ -1975,28 +4129,35 @@ type Props = {
     endTime: string;
     reason: string;
   };
+  initialDate?: string;
+  initialClassroomId?: string;
 };
 
-export default function RequestForm({ classrooms, requestId, initial }: Props) {
+export default function RequestForm({
+  classrooms,
+  requestId,
+  initial,
+  initialDate,
+  initialClassroomId,
+}: Props) {
   const router = useRouter();
   const [classroomIds, setClassroomIds] = useState<string[]>(
-    initial?.classroomIds ?? []
+    initial?.classroomIds ?? (initialClassroomId ? [initialClassroomId] : [])
   );
   const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? "");
+  const [usageDate, setUsageDate] = useState(initial?.usageDate ?? initialDate ?? "");
   const [startTime, setStartTime] = useState(initial?.startTime ?? "");
   const [endTime, setEndTime] = useState(initial?.endTime ?? "");
   const [reason, setReason] = useState(initial?.reason ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Re-check classroom availability whenever date/time changes.
+  const timeRangeValid =
+    !!usageDate && !!startTime && !!endTime && startTime < endTime;
+
   useEffect(() => {
-    if (!usageDate || !startTime || !endTime || startTime >= endTime) {
-      setUnavailableIds(new Set());
-      return;
-    }
+    if (!timeRangeValid) return;
 
     let cancelled = false;
     setCheckingAvailability(true);
@@ -2017,14 +4178,13 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms.filter((c) => !availableIds.has(c.id)).map((c) => c.id)
         );
         setUnavailableIds(unavailable);
-        // Drop any already-selected classroom that just became unavailable.
         setClassroomIds((prev) => prev.filter((id) => !unavailable.has(id)));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [usageDate, startTime, endTime, classrooms]);
+  }, [timeRangeValid, usageDate, startTime, endTime, classrooms]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -2133,7 +4293,7 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
           classrooms={classrooms}
           selectedIds={classroomIds}
           onChange={setClassroomIds}
-          unavailableIds={unavailableIds}
+          unavailableIds={timeRangeValid ? unavailableIds : new Set()}
         />
       </div>
 
@@ -2155,6 +4315,210 @@ export default function RequestForm({ classrooms, requestId, initial }: Props) {
         {loading ? "Saving..." : requestId ? "Save changes" : "Submit request"}
       </button>
     </form>
+  );
+}
+
+
+
+================================================
+FILE: components/set-password-form.tsx
+================================================
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+export default function SetPasswordForm() {
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setReady(!!data.session);
+    });
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+    const { error: updateError } = await supabase.auth.updateUser({ password });
+    setLoading(false);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setDone(true);
+    setTimeout(() => router.replace("/club-admin/dashboard"), 1500);
+  }
+
+  if (!ready) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          This link is invalid or has expired. Ask the school admin to send a new invite.
+        </p>
+      </main>
+    );
+  }
+
+  if (done) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          Password set. Redirecting…
+        </p>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">Set your password</h1>
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-xl border border-neutral-200/70 bg-white p-6 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
+        >
+          {error && (
+            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+              {error}
+            </div>
+          )}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">New password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Confirm password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+          >
+            {loading ? "Saving..." : "Set password"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: components/settings-form.tsx
+================================================
+"use client";
+
+import { useRouter } from "next/navigation";
+import type { dictionaries } from "@/lib/i18n";
+
+type SettingsDict = (typeof dictionaries)["en"]["settings"];
+
+export default function SettingsForm({
+  theme,
+  locale,
+  t,
+}: {
+  theme: "light" | "dark";
+  locale: "en" | "id";
+  t: SettingsDict;
+}) {
+  const router = useRouter();
+
+  function setCookie(name: string, value: string) {
+    document.cookie = `${name}=${value}; path=/; max-age=31536000`;
+  }
+
+  function setTheme(value: "light" | "dark") {
+    setCookie("theme", value);
+    document.documentElement.classList.toggle("dark", value === "dark");
+    router.refresh();
+  }
+
+  function setLocale(value: "en" | "id") {
+    setCookie("locale", value);
+    router.refresh();
+  }
+
+  const activeClass =
+    "border-neutral-900 bg-neutral-900 text-white dark:border-neutral-100 dark:bg-neutral-100 dark:text-neutral-900";
+  const inactiveClass =
+    "border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800";
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <p className="text-sm font-medium">{t.theme}</p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setTheme("light")}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${theme === "light" ? activeClass : inactiveClass}`}
+          >
+            {t.light}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTheme("dark")}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${theme === "dark" ? activeClass : inactiveClass}`}
+          >
+            {t.dark}
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium">{t.language}</p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setLocale("en")}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${locale === "en" ? activeClass : inactiveClass}`}
+          >
+            English
+          </button>
+          <button
+            type="button"
+            onClick={() => setLocale("id")}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium ${locale === "id" ? activeClass : inactiveClass}`}
+          >
+            Bahasa Indonesia
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -2192,9 +4556,9 @@ export default function SignOutButton({
       type="button"
       onClick={handleSignOut}
       disabled={loading}
-      className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-50"
+      className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
     >
-      {loading ? "Signing out..." : label}
+      {loading ? "..." : label}
     </button>
   );
 }
@@ -2261,6 +4625,8 @@ export type Profile = {
   display_name: string;
   role: UserRole;
   club_id: string | null;
+  status: string;
+  removal_reason: string | null;
 };
 
 const loginPathByRole: Record<UserRole, string> = {
@@ -2270,8 +4636,10 @@ const loginPathByRole: Record<UserRole, string> = {
 
 /**
  * Loads the current authenticated user's profile and enforces the expected
- * role. Unauthenticated users are sent to that role's login page; signed-in
- * users with the wrong role (or no profile) are signed out and sent there too.
+ * role and account status. Unauthenticated users are sent to that role's
+ * login page; signed-in users with the wrong role, a pending registration,
+ * or a removed account are signed out and redirected with an explanatory
+ * status in the query string.
  *
  * This is server-side only. Database RLS remains the real authorization layer.
  */
@@ -2289,7 +4657,7 @@ export async function requireRole(role: UserRole): Promise<Profile> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, display_name, role, club_id")
+    .select("id, display_name, role, club_id, status, removal_reason")
     .eq("id", user.id)
     .single();
 
@@ -2298,7 +4666,137 @@ export async function requireRole(role: UserRole): Promise<Profile> {
     redirect(loginPath);
   }
 
+  if (profile.status === "pending") {
+    await supabase.auth.signOut();
+    redirect(`${loginPath}?status=pending`);
+  }
+
+  if (profile.status === "removed") {
+    await supabase.auth.signOut();
+    const reason = encodeURIComponent(profile.removal_reason ?? "No reason given");
+    redirect(`${loginPath}?status=removed&reason=${reason}`);
+  }
+
   return profile;
+}
+
+
+
+================================================
+FILE: lib/i18n.ts
+================================================
+import { cookies } from "next/headers";
+
+export type Locale = "en" | "id";
+
+export const dictionaries = {
+  en: {
+    home: {
+      title: "School Class Booking",
+      subtitle:
+        "Request classrooms for your club, and let school administrators review, approve, or reject them.",
+      schoolAdmin: "School Admin",
+      clubAdmin: "Club Admin",
+    },
+    login: {
+      schoolTitle: "School Admin Login",
+      schoolSubtitle: "Enter your credentials to access the admin panel",
+      clubTitle: "Club Admin Login",
+      clubSubtitle: "Enter your credentials to manage your club's bookings",
+      email: "Email",
+      password: "Password",
+      show: "Show",
+      hide: "Hide",
+      signIn: "Sign in",
+      signingIn: "Signing in...",
+      back: "← Back",
+      tryClub: "Try logging in as Club Admin",
+      trySchool: "Try logging in as School Admin",
+    },
+    settings: {
+      title: "Settings",
+      theme: "Appearance",
+      light: "Light",
+      dark: "Dark",
+      language: "Language",
+      back: "← Dashboard",
+    },
+    dashboard: {
+      schoolAdminLabel: "School Admin",
+      clubAdminLabel: "Club Admin",
+      pendingTitle: "Pending requests",
+      pendingDesc: "Review, accept, or reject classroom requests",
+      classroomsTitle: "Classrooms",
+      classroomsDescSchool: "View classroom list and availability",
+      classroomsDescClub: "Check availability and pick rooms",
+      clubsTitle: "Clubs",
+      clubsDesc: "View registered clubs",
+      myRequestsTitle: "My requests",
+      myRequestsDesc: "Create, edit, or cancel requests",
+      responsesTitle: "Responses",
+      responsesDesc: "View accepted or rejected requests",
+      settingsLabel: "Settings",
+      signOut: "Sign out",
+    },
+  },
+  id: {
+    home: {
+      title: "Pemesanan Kelas Sekolah",
+      subtitle:
+        "Ajukan ruang kelas untuk klub kamu, dan biarkan admin sekolah meninjau, menyetujui, atau menolaknya.",
+      schoolAdmin: "Admin Sekolah",
+      clubAdmin: "Admin Klub",
+    },
+    login: {
+      schoolTitle: "Login Admin Sekolah",
+      schoolSubtitle: "Masukkan kredensial untuk mengakses panel admin",
+      clubTitle: "Login Admin Klub",
+      clubSubtitle: "Masukkan kredensial untuk mengelola pemesanan klub kamu",
+      email: "Email",
+      password: "Kata Sandi",
+      show: "Tampilkan",
+      hide: "Sembunyikan",
+      signIn: "Masuk",
+      signingIn: "Sedang masuk...",
+      back: "← Kembali",
+      tryClub: "Coba masuk sebagai Admin Klub",
+      trySchool: "Coba masuk sebagai Admin Sekolah",
+    },
+    settings: {
+      title: "Pengaturan",
+      theme: "Tampilan",
+      light: "Terang",
+      dark: "Gelap",
+      language: "Bahasa",
+      back: "← Dasbor",
+    },
+    dashboard: {
+      schoolAdminLabel: "Admin Sekolah",
+      clubAdminLabel: "Admin Klub",
+      pendingTitle: "Permintaan tertunda",
+      pendingDesc: "Tinjau, setujui, atau tolak permintaan ruang kelas",
+      classroomsTitle: "Ruang Kelas",
+      classroomsDescSchool: "Lihat daftar ruang kelas dan ketersediaannya",
+      classroomsDescClub: "Cek ketersediaan dan pilih ruangan",
+      clubsTitle: "Klub",
+      clubsDesc: "Lihat klub terdaftar",
+      myRequestsTitle: "Permintaan saya",
+      myRequestsDesc: "Buat, ubah, atau batalkan permintaan",
+      responsesTitle: "Tanggapan",
+      responsesDesc: "Lihat permintaan yang diterima atau ditolak",
+      settingsLabel: "Pengaturan",
+      signOut: "Keluar",
+    },
+  },
+} as const;
+
+export async function getLocale(): Promise<Locale> {
+  const cookieStore = await cookies();
+  return cookieStore.get("locale")?.value === "id" ? "id" : "en";
+}
+
+export function getDictionary(locale: Locale) {
+  return dictionaries[locale];
 }
 
 
@@ -2318,6 +4816,12 @@ export type Classroom = {
 export type Club = {
   id: string;
   name: string;
+  description: string | null;
+  president_name: string | null;
+  president_phone: string | null;
+  vice_president_name: string | null;
+  vice_president_phone: string | null;
+  logo_path: string | null;
   created_at: string;
 };
 

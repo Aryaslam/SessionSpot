@@ -41,7 +41,7 @@ export default async function ClubAdminClassrooms() {
             Failed to load classrooms: {error.message}
           </p>
         ) : (
-          <ClassroomGrid classrooms={classrooms ?? []} />
+          <ClassroomGrid classrooms={classrooms ?? []} canRequest />
         )}
       </div>
     </main>

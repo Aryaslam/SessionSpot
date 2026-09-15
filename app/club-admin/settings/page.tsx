@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import SignOutButton from "@/components/sign-out-button";
 import SettingsForm from "@/components/settings-form";
+import ChangePasswordButton from "@/components/change-password-button";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Settings · Club Admin" };
@@ -33,6 +34,7 @@ export default async function ClubAdminSettings() {
           <SignOutButton loginPath="/club-admin/login" />
         </header>
         <SettingsForm theme={theme} locale={locale} t={t} />
+        <ChangePasswordButton />
       </div>
     </main>
   );

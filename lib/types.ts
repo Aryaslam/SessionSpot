@@ -10,6 +10,12 @@ export type Classroom = {
 export type Club = {
   id: string;
   name: string;
+  description: string | null;
+  president_name: string | null;
+  president_phone: string | null;
+  vice_president_name: string | null;
+  vice_president_phone: string | null;
+  logo_path: string | null;
   created_at: string;
 };
 
