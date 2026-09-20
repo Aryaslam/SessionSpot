@@ -32,40 +32,53 @@ Directory structure:
     │   │       └── route.ts
     │   ├── club-admin/
     │   │   ├── classrooms/
+    │   │   │   ├── loading.tsx
     │   │   │   └── page.tsx
     │   │   ├── dashboard/
+    │   │   │   ├── loading.tsx
     │   │   │   └── page.tsx
     │   │   ├── login/
     │   │   │   └── page.tsx
     │   │   ├── register/
     │   │   │   └── page.tsx
     │   │   ├── requests/
+    │   │   │   ├── loading.tsx
     │   │   │   ├── page.tsx
     │   │   │   ├── [id]/
     │   │   │   │   └── edit/
+    │   │   │   │       ├── loading.tsx
     │   │   │   │       └── page.tsx
     │   │   │   └── new/
+    │   │   │       ├── loading.tsx
     │   │   │       └── page.tsx
     │   │   ├── responses/
+    │   │   │   ├── loading.tsx
     │   │   │   └── page.tsx
     │   │   ├── set-password/
     │   │   │   └── page.tsx
     │   │   └── settings/
+    │   │       ├── loading.tsx
     │   │       └── page.tsx
     │   └── school-admin/
     │       ├── classrooms/
+    │       │   ├── loading.tsx
     │       │   └── page.tsx
     │       ├── clubs/
+    │       │   ├── loading.tsx
     │       │   └── page.tsx
     │       ├── dashboard/
+    │       │   ├── loading.tsx
     │       │   └── page.tsx
     │       ├── login/
     │       │   └── page.tsx
     │       ├── requests/
+    │       │   ├── loading.tsx
     │       │   ├── page.tsx
     │       │   └── [id]/
+    │       │       ├── loading.tsx
     │       │       └── page.tsx
     │       └── settings/
+    │           ├── loading.tsx
     │           └── page.tsx
     ├── components/
     │   ├── approve-reject-form.tsx
@@ -81,6 +94,7 @@ Directory structure:
     │   ├── club-form.tsx
     │   ├── club-manager.tsx
     │   ├── login-form.tsx
+    │   ├── page-loading.tsx
     │   ├── pending-accounts-manager.tsx
     │   ├── register-form.tsx
     │   ├── request-form.tsx
@@ -874,6 +888,7 @@ FILE: package.json
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "supabase": "^2.117.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5"
   }
@@ -1423,6 +1438,13 @@ export async function POST(req: NextRequest) {
 
 
 ================================================
+FILE: app/club-admin/classrooms/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
+
+
+
+================================================
 FILE: app/club-admin/classrooms/page.tsx
 ================================================
 import Link from "next/link";
@@ -1474,6 +1496,13 @@ export default async function ClubAdminClassrooms() {
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/club-admin/dashboard/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -1585,6 +1614,13 @@ export const metadata = { title: "Register · Club Admin" };
 export default function RegisterPage() {
   return <RegisterForm />;
 }
+
+
+
+================================================
+FILE: app/club-admin/requests/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -1705,6 +1741,13 @@ export default async function ClubAdminRequests() {
 
 
 ================================================
+FILE: app/club-admin/requests/[id]/edit/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
+
+
+
+================================================
 FILE: app/club-admin/requests/[id]/edit/page.tsx
 ================================================
 import Link from "next/link";
@@ -1780,6 +1823,13 @@ export default async function EditRequestPage({
 
 
 ================================================
+FILE: app/club-admin/requests/new/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
+
+
+
+================================================
 FILE: app/club-admin/requests/new/page.tsx
 ================================================
 import Link from "next/link";
@@ -1829,6 +1879,13 @@ export default async function NewRequestPage({
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/club-admin/responses/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -1982,6 +2039,13 @@ export default function SetPasswordPage() {
 
 
 ================================================
+FILE: app/club-admin/settings/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
+
+
+
+================================================
 FILE: app/club-admin/settings/page.tsx
 ================================================
 import Link from "next/link";
@@ -2025,6 +2089,13 @@ export default async function ClubAdminSettings() {
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/school-admin/classrooms/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -2079,6 +2150,13 @@ export default async function SchoolAdminClassrooms() {
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/school-admin/clubs/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -2149,6 +2227,13 @@ export default async function SchoolAdminClubs() {
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/school-admin/dashboard/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -2246,6 +2331,13 @@ export default async function SchoolAdminLoginPage() {
     </Suspense>
   );
 }
+
+
+
+================================================
+FILE: app/school-admin/requests/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -2405,6 +2497,13 @@ export default async function SchoolAdminRequests() {
 
 
 ================================================
+FILE: app/school-admin/requests/[id]/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
+
+
+
+================================================
 FILE: app/school-admin/requests/[id]/page.tsx
 ================================================
 import Link from "next/link";
@@ -2513,6 +2612,13 @@ export default async function RequestDetailPage({
     </main>
   );
 }
+
+
+
+================================================
+FILE: app/school-admin/settings/loading.tsx
+================================================
+export { default } from "@/components/page-loading";
 
 
 
@@ -4483,6 +4589,29 @@ export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
             Don&apos;t have an account? Register
           </Link>
         )}
+      </div>
+    </main>
+  );
+}
+
+
+
+================================================
+FILE: components/page-loading.tsx
+================================================
+export default function PageLoading() {
+  return (
+    <main className="min-h-screen px-4 py-8 sm:px-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
+        <div className="h-6 w-40 animate-pulse rounded bg-neutral-200 dark:bg-neutral-800" />
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-xl bg-neutral-200 dark:bg-neutral-800"
+            />
+          ))}
+        </div>
       </div>
     </main>
   );
