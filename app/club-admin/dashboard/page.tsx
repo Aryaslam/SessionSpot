@@ -37,7 +37,7 @@ export default async function ClubAdminDashboard() {
         <section className="grid gap-4 sm:grid-cols-3">
           <Link
             href="/club-admin/classrooms"
-            className="rounded-xl border border-neutral-200/70 bg-[#86BCBD] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-teal p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-bold">{t.classroomsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 text-white" >
@@ -46,7 +46,7 @@ export default async function ClubAdminDashboard() {
           </Link>
           <Link
             href="/club-admin/requests"
-            className="rounded-xl border border-neutral-200/70 bg-[#F7E49B] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-yellow p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-bold">{t.myRequestsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
@@ -55,7 +55,7 @@ export default async function ClubAdminDashboard() {
           </Link>
           <Link
             href="/club-admin/responses"
-            className="rounded-xl border border-neutral-200/70 bg-[#A4CE8B] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-green p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-bold">{t.responsesTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
