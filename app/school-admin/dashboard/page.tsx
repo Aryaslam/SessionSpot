@@ -37,16 +37,16 @@ export default async function SchoolAdminDashboard() {
         <section className="grid gap-4 sm:grid-cols-3">
           <Link
             href="/school-admin/requests"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-teal p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-medium">{t.pendingTitle}</h2>
-            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 font-white">
               {t.pendingDesc}
             </p>
           </Link>
           <Link
             href="/school-admin/classrooms"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-yellow p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-medium">{t.classroomsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
@@ -55,7 +55,7 @@ export default async function SchoolAdminDashboard() {
           </Link>
           <Link
             href="/school-admin/clubs"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 card-green p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
             <h2 className="font-medium">{t.clubsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">

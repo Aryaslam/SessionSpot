@@ -1,5 +1,5 @@
 Directory structure:
-└── sessionspot/
+└── SessionSpot/
     ├── README.md
     ├── AGENTS.md
     ├── CLAUDE.md
@@ -59,6 +59,16 @@ Directory structure:
     │   │   └── settings/
     │   │       ├── loading.tsx
     │   │       └── page.tsx
+    │   ├── fonts/
+    │   │   ├── SFPRODISPLAYBLACKITALIC.OTF
+    │   │   ├── SFPRODISPLAYBOLD.OTF
+    │   │   ├── SFPRODISPLAYHEAVYITALIC.OTF
+    │   │   ├── SFPRODISPLAYLIGHTITALIC.OTF
+    │   │   ├── SFPRODISPLAYMEDIUM.OTF
+    │   │   ├── SFPRODISPLAYREGULAR.OTF
+    │   │   ├── SFPRODISPLAYSEMIBOLDITALIC.OTF
+    │   │   ├── SFPRODISPLAYTHINITALIC.OTF
+    │   │   └── SFPRODISPLAYULTRALIGHTITALIC.OTF
     │   └── school-admin/
     │       ├── classrooms/
     │       │   ├── loading.tsx
@@ -114,685 +124,7 @@ Directory structure:
 ================================================
 FILE: README.md
 ================================================
-# SessionSpot
-
-SessionSpot is a web-based classroom booking system designed for school clubs and school administrators.
-
-It allows club administrators to check classroom availability, submit booking requests, track their requests, and receive approval or rejection responses. School administrators can manage classrooms and clubs, review booking requests, and approve or reject them.
-
-## Features
-
-### Club Admin
-
-- Register a club administrator account
-- Wait for school administrator approval before accessing the system
-- Log in through a dedicated Club Admin login
-- View active classrooms
-- View classroom availability through a calendar
-- Create classroom booking requests
-- Select multiple classrooms for a request
-- Automatically check classroom availability for the requested date and time
-- Edit pending requests
-- Cancel pending requests
-- View accepted and rejected responses
-- View rejection reasons
-- View digital signatures attached to accepted/rejected responses
-- Change password
-- Switch between light and dark themes
-- Switch between English and Bahasa Indonesia
-
-### School Admin
-
-- Log in through a dedicated School Admin login
-- View and manage classrooms
-- Add classrooms
-- Edit classroom names, grades, and descriptions
-- Activate or deactivate classrooms
-- View classroom booking calendars
-- View registered clubs
-- Create and manage club information
-- View club administrators
-- Invite additional club administrator accounts
-- Manage pending club administrator registrations
-- Remove club administrator accounts with a recorded reason
-- View all booking requests
-- Separate pending requests from request history
-- View individual request details
-- Approve booking requests
-- Reject booking requests with a reason
-- Attach an optional digital signature when responding to requests
-- Change application appearance settings
-- Switch between English and Bahasa Indonesia
-
-## Tech Stack
-
-- [Next.js](https://nextjs.org/) 16
-- [React](https://react.dev/) 19
-- TypeScript
-- [Tailwind CSS](https://tailwindcss.com/) 4
-- [Supabase](https://supabase.com/)
-  - Authentication
-  - PostgreSQL database
-  - Row Level Security
-  - Storage
-  - Database functions / RPCs
-- ESLint
-
-## Architecture
-
-SessionSpot uses Next.js for the application layer and Supabase for authentication, database operations, and storage.
-
-```text
-┌──────────────────────┐
-│      Next.js         │
-│   App Router         │
-├──────────────────────┤
-│ Server Components    │
-│ Client Components    │
-│ API Routes           │
-│ Authentication       │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│       Supabase       │
-├──────────────────────┤
-│ Authentication       │
-│ PostgreSQL           │
-│ Row Level Security   │
-│ Storage              │
-│ Database RPCs        │
-└──────────────────────┘
-```
-Authentication is handled through Supabase Auth. Server-side role checks are performed by the application, while database Row Level Security remains the primary authorization boundary.
-
-## User Roles
-
-SessionSpot currently supports two roles:
-
-### `school_admin`
-
-School administrators are responsible for:
-
-* Managing classrooms
-* Managing clubs
-* Managing club administrator accounts
-* Reviewing booking requests
-* Accepting or rejecting requests
-
-### `club_admin`
-
-Club administrators are responsible for:
-
-* Managing their club's booking requests
-* Checking classroom availability
-* Creating requests
-* Editing pending requests
-* Cancelling pending requests
-* Viewing responses
-
-## Request Lifecycle
-
-```text
-A typical classroom booking follows this flow:
-
-Club Admin
-    │
-    │ Create request
-    ▼
-┌─────────┐
-│ Pending │
-└────┬────┘
-     │
-     ├───────────────┐
-     │               │
-     ▼               ▼
-  Accept           Reject
-     │               │
-     ▼               ▼
- Accepted          Rejected
-     │
-     ▼
- Classroom booking
-```
-Club administrators can edit or cancel a request while it is still pending.
-
-## Project Structure
-
-```text
-school-class-booking/
-├── app/
-│   ├── api/
-│   │   ├── accounts/
-│   │   │   └── [id]/
-│   │   │       ├── reject/
-│   │   │       └── remove/
-│   │   ├── clubs/
-│   │   │   ├── [clubId]/
-│   │   │   │   ├── accounts/
-│   │   │   │   └── invite/
-│   │   │   └── public-list/
-│   │   └── signature-url/
-│   │
-│   ├── club-admin/
-│   │   ├── classrooms/
-│   │   ├── dashboard/
-│   │   ├── login/
-│   │   ├── register/
-│   │   ├── requests/
-│   │   │   ├── [id]/edit/
-│   │   │   └── new/
-│   │   ├── responses/
-│   │   ├── set-password/
-│   │   └── settings/
-│   │
-│   ├── school-admin/
-│   │   ├── classrooms/
-│   │   ├── clubs/
-│   │   ├── dashboard/
-│   │   ├── login/
-│   │   ├── requests/
-│   │   │   └── [id]/
-│   │   └── settings/
-│   │
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
-│
-├── components/
-│   ├── approve-reject-form.tsx
-│   ├── cancel-request-button.tsx
-│   ├── change-password-button.tsx
-│   ├── classroom-calendar-modal.tsx
-│   ├── classroom-grid.tsx
-│   ├── classroom-manager.tsx
-│   ├── classroom-select.tsx
-│   ├── club-accounts-manager.tsx
-│   ├── club-calendar.tsx
-│   ├── club-detail-modal.tsx
-│   ├── club-form.tsx
-│   ├── club-manager.tsx
-│   ├── login-form.tsx
-│   ├── pending-accounts-manager.tsx
-│   ├── register-form.tsx
-│   ├── request-form.tsx
-│   ├── set-password-form.tsx
-│   ├── settings-form.tsx
-│   ├── sign-out-button.tsx
-│   └── view-signature-button.tsx
-│
-├── lib/
-│   ├── auth.ts
-│   ├── i18n.ts
-│   ├── types.ts
-│   └── supabase/
-│       ├── admin.ts
-│       ├── client.ts
-│       └── server.ts
-│
-├── AGENTS.md
-├── CLAUDE.md
-├── eslint.config.mjs
-├── next.config.ts
-├── package.json
-├── postcss.config.mjs
-├── proxy.ts
-└── tsconfig.json
-```
-## Getting Started
-
-### Prerequisites
-
-Make sure you have:
-
-* Node.js installed
-* A Supabase project
-* A configured Supabase database
-* Supabase Authentication enabled
-
-### Install dependencies
-
-```bash
-npm install
-```
-
-### Environment Variables
-
-Create a `.env.local` file in the project root:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-```
-
-The `SUPABASE_SERVICE_ROLE_KEY` is a sensitive server-side credential and must never be exposed to the browser or committed to Git.
-
-For an open-source repository, commit an `.env.example` file instead:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
-
-### Run the development server
-
-```bash
-npm run dev
-```
-
-Then open:
-
-```text
-http://localhost:3000
-```
-
-### Build for production
-
-```bash
-npm run build
-```
-
-### Start the production server
-
-```bash
-npm start
-```
-
-### Run ESLint
-
-```bash
-npm run lint
-```
-
-## Supabase
-
-SessionSpot relies on Supabase for its backend.
-
-The application expects database resources including:
-
-* `profiles`
-* `clubs`
-* `classrooms`
-* `requests`
-* `request_classrooms`
-* `responses`
-
-It also uses several PostgreSQL functions through Supabase RPC:
-
-* `create_request`
-* `update_request`
-* `cancel_request`
-* `approve_request`
-* `reject_request`
-* `available_classrooms`
-* `classroom_booked_dates`
-* `club_booked_dates`
-
-The exact database schema, RLS policies, functions, triggers, and storage configuration should be maintained separately as Supabase migrations.
-
-A recommended structure is:
-
-```text
-supabase/
-└── migrations/
-    ├── 001_initial_schema.sql
-    ├── 002_rls_policies.sql
-    ├── 003_booking_functions.sql
-    └── 004_storage.sql
-```
-
-## Authentication and Authorization
-
-SessionSpot uses Supabase Auth for user authentication.
-
-After authentication, the application retrieves the user's profile and verifies:
-
-* The user's role
-* The account status
-* The associated club, when applicable
-
-Supported account statuses include:
-
-* `pending`
-* `removed`
-
-A pending Club Admin cannot access the dashboard until approved by a School Admin.
-
-Removed accounts are signed out and redirected to the appropriate login page.
-
-Application-level role checks are implemented in `lib/auth.ts`.
-
-However, application-level checks should not be considered the final authorization boundary. Database Row Level Security should independently enforce access to protected data.
-
-## Digital Signatures
-
-School administrators can optionally upload a digital signature when accepting or rejecting a request.
-
-Signatures are stored in the Supabase Storage bucket:
-
-```text
-digital-signatures
-```
-
-The application does not expose the storage object directly. Instead, authorized users request a short-lived signed URL through:
-
-```text
-POST /api/signature-url
-```
-
-The signed URL currently expires after 60 seconds.
-
-The `digital-signatures` bucket should remain private.
-
-## Club Logos
-
-Clubs may have a logo associated with them.
-
-Logo files are stored in the Supabase Storage bucket:
-
-```text
-club-logos
-```
-
-The application uses the configured Supabase project URL to construct public logo URLs.
-
-If club logos contain private or sensitive information, the storage bucket should be configured appropriately rather than exposed publicly.
-
-## Club Administrator Registration
-
-Club administrators can register through:
-
-```text
-/club-admin/register
-```
-
-The registration process associates the account with a club and places the account into a pending state.
-
-School administrators can review pending registrations and remove rejected accounts.
-
-School administrators can also invite additional club administrator accounts by email.
-
-Each club currently supports a maximum of 5 connected club administrator accounts.
-
-Email invitations require SMTP configuration in Supabase.
-
-## Availability
-
-Before submitting a booking request, the application checks classroom availability using the `available_classrooms` RPC.
-
-The request form checks:
-
-* Date
-* Start time
-* End time
-* Classroom availability
-
-A request cannot be submitted without:
-
-* At least one classroom
-* A usage date
-* A start time
-* An end time
-* A valid time range
-* A reason
-
-The application also rechecks selected classroom availability before submitting the request.
-
-## Internationalization
-
-The interface currently supports:
-
-* English
-* Bahasa Indonesia
-
-The selected language is stored in a browser cookie named:
-
-```text
-locale
-```
-
-Translations are defined in:
-
-```text
-lib/i18n.ts
-```
-
-## Theme
-
-The application supports:
-
-* Light mode
-* Dark mode
-
-The selected theme is stored in a browser cookie named:
-
-```text
-theme
-```
-
-## Deployment
-
-SessionSpot can be deployed to Vercel.
-
-A recommended deployment workflow is:
-
-```text
-GitHub
-   │
-   ▼
-Vercel
-   │
-   ▼
-Next.js Application
-   │
-   ▼
-Supabase
-```
-
-For Vercel deployment:
-
-1. Push the repository to GitHub.
-2. Import the repository into Vercel.
-3. Configure the required environment variables in Vercel.
-4. Deploy the application.
-
-Do not commit production credentials to GitHub.
-
-The production environment should contain the real Supabase credentials through Vercel Environment Variables.
-
-## Open Source Security
-
-If this repository is made public, keep the following information private:
-
-* `SUPABASE_SERVICE_ROLE_KEY`
-* Production credentials
-* Passwords
-* Real user accounts
-* Real student or staff information
-* Production database dumps
-* Private digital signatures
-* Private storage credentials
-* Other secrets or authentication tokens
-
-### Public repository
-
-The public repository can contain:
-
-```text
-Source code
-README
-Documentation
-.env.example
-Supabase migrations
-Synthetic seed data
-Configuration that is safe to expose
-```
-
-### Private deployment
-
-Keep the following in the production environment:
-
-```text
-Real Supabase project
-Real users
-Real database records
-Production storage
-Production environment variables
-Service-role credentials
-```
-
-### Check Git history
-
-Before making the repository public, inspect the entire Git history.
-
-For example:
-
-```bash
-git grep -n "SUPABASE_SERVICE_ROLE_KEY"
-git grep -n "NEXT_PUBLIC_SUPABASE"
-git log --all --full-history -- .env.local
-git log -p --all
-```
-
-Checking only the current version of the repository is not sufficient. A secret committed in an old commit can remain accessible in Git history.
-
-If a service-role key has ever been committed, rotate the key before making the repository public and clean the Git history if necessary.
-
-## Environment-Specific Configuration
-
-The current `next.config.ts` contains development-specific origins/IP addresses.
-
-Before publishing the repository publicly, review values such as:
-
-```text
-192.168.x.x
-172.x.x.x
-```
-
-and other development infrastructure addresses.
-
-These are not necessarily secrets, but they may expose unnecessary information about the development environment and generally do not belong in a reusable open-source configuration unless they are actually required.
-
-## Security Considerations
-
-SessionSpot uses several layers of protection:
-
-* Supabase Auth for authentication
-* Server-side role validation
-* Row Level Security for database authorization
-* Server-only service-role access
-* Private storage for digital signatures
-* Short-lived signed URLs for signature access
-
-When modifying the application, ensure that authorization is enforced at the database level as well as in the UI/API layer.
-
-Important cases to test include:
-
-* A Club Admin cannot access another club's requests.
-* A Club Admin cannot approve or reject requests.
-* A School Admin can review requests.
-* Unauthenticated users cannot access protected data.
-* Pending Club Admin accounts cannot access the dashboard.
-* Removed accounts cannot access the application.
-* Digital signatures cannot be accessed by unauthorized users.
-* A user cannot modify another user's request.
-* A user cannot bypass classroom availability checks by directly calling an RPC.
-
-## Development Notes
-
-The project includes `AGENTS.md` with project-specific instructions for working with the current Next.js version.
-
-In particular, the project explicitly recommends checking the installed Next.js documentation under:
-
-```text
-node_modules/next/dist/docs/
-```
-
-before making changes that depend on Next.js APIs or conventions.
-
-This is especially important because the project uses Next.js 16, where APIs and conventions may differ from older Next.js versions.
-
-## Current TODO / Known Issues
-
-The current project README tracks:
-
-* Supabase email rate-limit handling when creating an account
-
-Additional backend reproducibility work may be required before the project can be fully cloned and deployed from scratch, particularly if the Supabase schema, RLS policies, RPC functions, storage configuration, and seed data are not included in the repository.
-
-## Contributing
-
-Contributions are welcome.
-
-Before submitting a pull request:
-
-1. Install dependencies.
-
-```bash
-npm install
-```
-
-2. Run the linter.
-
-```bash
-npm run lint
-```
-
-3. Test the production build.
-
-```bash
-npm run build
-```
-
-4. Verify authentication and authorization behavior.
-5. Make sure no secrets or private data are included.
-6. Keep Supabase schema changes versioned through migrations.
-
-## License
-
-No license has currently been selected for this project.
-
-If you intend to make SessionSpot genuinely open source, add a license file such as:
-
-```text
-LICENSE
-```
-
-Common choices include:
-
-* MIT for a simple permissive license
-* Apache-2.0 for a permissive license with additional patent-related provisions
-
-Do not label a repository as "open source" without actually providing an appropriate license.
-
-## Project Status
-
-SessionSpot is an actively developed classroom booking system.
-
-The core workflow currently includes:
-
-```text
-Club Registration
-       ↓
-School Admin Approval
-       ↓
-Club Admin Login
-       ↓
-Classroom Availability
-       ↓
-Booking Request
-       ↓
-School Admin Review
-       ↓
-Accept / Reject
-       ↓
-Club Admin Response
-```
-
-The project is intended to provide a simple, centralized way for schools to manage classroom usage by student clubs.
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 2474: character maps to <undefined>
 
 
 ================================================
@@ -802,9 +134,9 @@ FILE: AGENTS.md
 
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+This version has breaking changes â€” APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+This block is written and re-added by `next dev` â€” verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
@@ -1004,6 +336,78 @@ FILE: app/globals.css
 ================================================
 @import "tailwindcss";
 
+/* SF Pro Display - UltraLight Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYULTRALIGHTITALIC.OTF') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* SF Pro Display - Thin Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYTHINITALIC.OTF') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+}
+
+/* SF Pro Display - Light Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYLIGHTITALIC.OTF') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* SF Pro Display - Regular */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* SF Pro Display - Medium */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYMEDIUM.OTF') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* SF Pro Display - SemiBold Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYSEMIBOLDITALIC.OTF') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* SF Pro Display - Bold */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYBOLD.OTF') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* SF Pro Display - Heavy Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYHEAVYITALIC.OTF') format('opentype');
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* SF Pro Display - Black Italic */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('./fonts/SFPRODISPLAYBLACKITALIC.OTF') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -1026,7 +430,7 @@ FILE: app/globals.css
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "SF Pro Display";
 }
 
 
@@ -1367,7 +771,7 @@ FILE: app/api/clubs/public-list/route.ts
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Public, unauthenticated endpoint — only exposes id + name for the
+// Public, unauthenticated endpoint â€” only exposes id + name for the
 // registration form's club dropdown. No sensitive fields.
 export async function GET() {
   const admin = createAdminClient();
@@ -1408,7 +812,7 @@ export async function POST(req: NextRequest) {
   }
 
   // RLS enforces that this row is only visible to the school admin
-  // or the requesting club's admin — no manual authorization needed here.
+  // or the requesting club's admin â€” no manual authorization needed here.
   const { data: response, error } = await supabase
     .from("responses")
     .select("digital_signature_path")
@@ -1447,56 +851,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/club-admin/classrooms/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import ClassroomGrid from "@/components/classroom-grid";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Classrooms · Club Admin" };
-
-export default async function ClubAdminClassrooms() {
-  await requireRole("club_admin");
-
-  const supabase = await createClient();
-  const { data: classrooms, error } = await supabase
-    .from("classrooms")
-    .select("id, class_name, grade, description, active, created_at")
-    .eq("active", true)
-    .order("grade")
-    .order("class_name");
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/club-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Classrooms
-            </h1>
-          </div>
-          <SignOutButton loginPath="/club-admin/login" />
-        </header>
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load classrooms: {error.message}
-          </p>
-        ) : (
-          <ClassroomGrid classrooms={classrooms ?? []} canRequest />
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1123: character maps to <undefined>
 
 
 ================================================
@@ -1548,27 +903,27 @@ export default async function ClubAdminDashboard() {
         <section className="grid gap-4 sm:grid-cols-3">
           <Link
             href="/club-admin/classrooms"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 bg-[#86BCBD] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">{t.classroomsTitle}</h2>
-            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            <h2 className="font-bold">{t.classroomsTitle}</h2>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 text-white" >
               {t.classroomsDescClub}
             </p>
           </Link>
           <Link
             href="/club-admin/requests"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 bg-[#F7E49B] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">{t.myRequestsTitle}</h2>
+            <h2 className="font-bold">{t.myRequestsTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               {t.myRequestsDesc}
             </p>
           </Link>
           <Link
             href="/club-admin/responses"
-            className="rounded-xl border border-neutral-200/70 bg-white p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            className="rounded-xl border border-neutral-200/70 bg-[#A4CE8B] p-5 shadow-sm transition-colors hover:bg-neutral-50 dark:border-neutral-800/70 dark:bg-neutral-900 dark:hover:bg-neutral-800"
           >
-            <h2 className="font-medium">{t.responsesTitle}</h2>
+            <h2 className="font-bold">{t.responsesTitle}</h2>
             <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               {t.responsesDesc}
             </p>
@@ -1609,7 +964,7 @@ FILE: app/club-admin/register/page.tsx
 import RegisterForm from "@/components/register-form";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Register · Club Admin" };
+export const metadata = { title: "Register Â· Club Admin" };
 
 export default function RegisterPage() {
   return <RegisterForm />;
@@ -1627,117 +982,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/club-admin/requests/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import CancelRequestButton from "@/components/cancel-request-button";
-import type { ClubRequest } from "@/lib/types";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "My requests · Club Admin" };
-
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  accepted: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  cancelled: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
-};
-
-export default async function ClubAdminRequests() {
-  await requireRole("club_admin");
-  const supabase = await createClient();
-
-  const { data: requests, error } = await supabase
-    .from("requests")
-    .select(
-      "id, club_id, usage_date, start_time, end_time, reason, status, created_at, updated_at, request_classrooms(classroom_id, classrooms(id, class_name, grade))"
-    )
-    .order("created_at", { ascending: false });
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/club-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              My requests
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/club-admin/requests/new"
-              className="rounded-md bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-3 py-1.5 text-sm font-medium hover:opacity-90"
-            >
-              New request
-            </Link>
-            <SignOutButton loginPath="/club-admin/login" />
-          </div>
-        </header>
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load requests: {error.message}
-          </p>
-        ) : !requests || requests.length === 0 ? (
-          <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-            No requests yet.
-          </p>
-        ) : (
-          <ul className="space-y-3">
-            {(requests as unknown as ClubRequest[]).map((r) => (
-              <li
-                key={r.id}
-                className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
-                  >
-                    {r.status}
-                  </span>
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                    {new Date(r.created_at).toLocaleString()}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm font-medium">
-                  {r.usage_date} · {r.start_time.slice(0, 5)}–
-                  {r.end_time.slice(0, 5)}
-                </p>
-                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-                  {r.request_classrooms
-                    .map((rc) => rc.classrooms.class_name)
-                    .join(", ")}
-                </p>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                  {r.reason}
-                </p>
-                {r.status === "pending" && (
-                  <div className="mt-3 flex gap-2">
-                    <Link
-                      href={`/club-admin/requests/${r.id}/edit`}
-                      className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-                    >
-                      Edit
-                    </Link>
-                    <CancelRequestButton requestId={r.id} />
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1653: character maps to <undefined>
 
 
 ================================================
@@ -1750,76 +995,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/club-admin/requests/[id]/edit/page.tsx
 ================================================
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import RequestForm from "@/components/request-form";
-import type { ClubRequest } from "@/lib/types";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Edit request · Club Admin" };
-
-export default async function EditRequestPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  await requireRole("club_admin");
-  const { id } = await params;
-  const supabase = await createClient();
-
-  const { data: request } = await supabase
-    .from("requests")
-    .select(
-      "id, usage_date, start_time, end_time, reason, status, request_classrooms(classroom_id)"
-    )
-    .eq("id", id)
-    .single();
-
-  if (!request || (request as unknown as ClubRequest).status !== "pending") {
-    notFound();
-  }
-
-  const { data: classrooms } = await supabase
-    .from("classrooms")
-    .select("id, class_name, grade, description, active, created_at")
-    .eq("active", true)
-    .order("grade")
-    .order("class_name");
-
-  const req = request as unknown as ClubRequest;
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-2xl space-y-6">
-        <div>
-          <Link
-            href="/club-admin/requests"
-            className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-          >
-            ← My requests
-          </Link>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            Edit request
-          </h1>
-        </div>
-        <RequestForm
-          classrooms={classrooms ?? []}
-          requestId={req.id}
-          initial={{
-            classroomIds: req.request_classrooms.map((rc) => rc.classroom_id),
-            usageDate: req.usage_date,
-            startTime: req.start_time.slice(0, 5),
-            endTime: req.end_time.slice(0, 5),
-            reason: req.reason,
-          }}
-        />
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1517: character maps to <undefined>
 
 
 ================================================
@@ -1832,54 +1008,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/club-admin/requests/new/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import RequestForm from "@/components/request-form";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "New request · Club Admin" };
-
-export default async function NewRequestPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ date?: string; classroom?: string }>;
-}) {
-  await requireRole("club_admin");
-  const { date, classroom } = await searchParams;
-  const supabase = await createClient();
-
-  const { data: classrooms } = await supabase
-    .from("classrooms")
-    .select("id, class_name, grade, description, active, created_at")
-    .eq("active", true)
-    .order("grade")
-    .order("class_name");
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-2xl space-y-6">
-        <div>
-          <Link
-            href="/club-admin/requests"
-            className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-          >
-            ← My requests
-          </Link>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            New request
-          </h1>
-        </div>
-        <RequestForm
-          classrooms={classrooms ?? []}
-          initialDate={date}
-          initialClassroomId={classroom}
-        />
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1099: character maps to <undefined>
 
 
 ================================================
@@ -1892,136 +1021,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/club-admin/responses/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import ViewSignatureButton from "@/components/view-signature-button";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Responses · Club Admin" };
-
-type ResponseRow = {
-  id: string;
-  status: "accepted" | "rejected";
-  rejection_reason: string | null;
-  digital_signature_path: string | null;
-  created_at: string;
-  responder_id: string;
-  profiles: { display_name: string } | null;
-  requests: {
-    id: string;
-    usage_date: string;
-    start_time: string;
-    end_time: string;
-    reason: string;
-    request_classrooms: {
-      classrooms: { class_name: string };
-    }[];
-  };
-};
-
-const STATUS_STYLES: Record<string, string> = {
-  accepted: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-};
-
-export default async function ClubAdminResponses() {
-  await requireRole("club_admin");
-  const supabase = await createClient();
-
-  // RLS restricts this to responses for requests belonging to the caller's club.
-  const { data: responses, error } = await supabase
-    .from("responses")
-    .select(
-      "id, status, rejection_reason, digital_signature_path, created_at, responder_id, profiles(display_name), requests(id, usage_date, start_time, end_time, reason, request_classrooms(classrooms(class_name)))"
-    )
-    .order("created_at", { ascending: false });
-
-  const rows = (responses ?? []) as unknown as ResponseRow[];
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/club-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Responses
-            </h1>
-          </div>
-          <SignOutButton loginPath="/club-admin/login" />
-        </header>
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load responses: {error.message}
-          </p>
-        ) : rows.length === 0 ? (
-          <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-            No responses yet.
-          </p>
-        ) : (
-          <ul className="space-y-3">
-            {rows.map((res) => (
-              <li
-                key={res.id}
-                className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_STYLES[res.status]}`}
-                  >
-                    {res.status}
-                  </span>
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                    {new Date(res.created_at).toLocaleString()}
-                  </span>
-                </div>
-
-                <p className="mt-2 text-sm font-medium">
-                  {res.requests.usage_date} ·{" "}
-                  {res.requests.start_time.slice(0, 5)}–
-                  {res.requests.end_time.slice(0, 5)}
-                </p>
-                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-                  {res.requests.request_classrooms
-                    .map((rc) => rc.classrooms.class_name)
-                    .join(", ")}
-                </p>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                  Reason: {res.requests.reason}
-                </p>
-
-                {res.status === "rejected" && res.rejection_reason && (
-                  <p className="mt-2 text-sm text-red-700 dark:text-red-400">
-                    Rejection reason: {res.rejection_reason}
-                  </p>
-                )}
-
-                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  By {res.profiles?.display_name ?? "Unknown"}
-                </p>
-
-                  {res.status === "accepted" && res.digital_signature_path && (
-                    <div className="mt-2">
-                      <ViewSignatureButton responseId={res.id} />
-                    </div>
-                  )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 2092: character maps to <undefined>
 
 
 ================================================
@@ -2057,7 +1057,7 @@ import SettingsForm from "@/components/settings-form";
 import ChangePasswordButton from "@/components/change-password-button";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Settings · Club Admin" };
+export const metadata = { title: "Settings Â· Club Admin" };
 
 export default async function ClubAdminSettings() {
   await requireRole("club_admin");
@@ -2093,6 +1093,60 @@ export default async function ClubAdminSettings() {
 
 
 ================================================
+FILE: app/fonts/SFPRODISPLAYBLACKITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYBOLD.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYHEAVYITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYLIGHTITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYMEDIUM.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYREGULAR.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYSEMIBOLDITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYTHINITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
+FILE: app/fonts/SFPRODISPLAYULTRALIGHTITALIC.OTF
+================================================
+[Binary file]
+
+
+================================================
 FILE: app/school-admin/classrooms/loading.tsx
 ================================================
 export { default } from "@/components/page-loading";
@@ -2102,55 +1156,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/school-admin/classrooms/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import ClassroomManager from "@/components/classroom-manager";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Classrooms · School Admin" };
-
-export default async function SchoolAdminClassrooms() {
-  await requireRole("school_admin");
-
-  const supabase = await createClient();
-  const { data: classrooms, error } = await supabase
-    .from("classrooms")
-    .select("id, class_name, grade, description, active, created_at")
-    .order("grade")
-    .order("class_name");
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/school-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Classrooms
-            </h1>
-          </div>
-          <SignOutButton loginPath="/school-admin/login" />
-        </header>
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load classrooms: {error.message}
-          </p>
-        ) : (
-          <ClassroomManager classrooms={classrooms ?? []} />
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1112: character maps to <undefined>
 
 
 ================================================
@@ -2163,71 +1169,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/school-admin/clubs/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import ClubManager from "@/components/club-manager";
-import PendingAccountsManager from "@/components/pending-accounts-manager";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Clubs · School Admin" };
-
-export default async function SchoolAdminClubs() {
-  await requireRole("school_admin");
-  const supabase = await createClient();
-
-  const { data: clubs, error } = await supabase
-    .from("clubs")
-    .select(
-      "id, name, description, president_name, president_phone, vice_president_name, vice_president_phone, logo_path, created_at"
-    )
-    .order("name");
-
-  const { data: pending } = await supabase
-    .from("profiles")
-    .select("id, display_name, clubs(name)")
-    .eq("role", "club_admin")
-    .eq("status", "pending");
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-8">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/school-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Clubs
-            </h1>
-          </div>
-          <SignOutButton loginPath="/school-admin/login" />
-        </header>
-
-        <PendingAccountsManager
-          pending={(pending ?? []) as unknown as {
-            id: string;
-            display_name: string;
-            clubs: { name: string } | null;
-          }[]}
-        />
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load clubs: {error.message}
-          </p>
-        ) : (
-          <ClubManager clubs={clubs ?? []} />
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1389: character maps to <undefined>
 
 
 ================================================
@@ -2344,156 +1286,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/school-admin/requests/page.tsx
 ================================================
-import Link from "next/link";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "@/components/sign-out-button";
-import type { ClubRequest } from "@/lib/types";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Requests · School Admin" };
-
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  accepted: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  cancelled: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
-};
-
-type RequestWithClub = ClubRequest & { clubs: { name: string } };
-
-export default async function SchoolAdminRequests() {
-  await requireRole("school_admin");
-  const supabase = await createClient();
-
-  const { data: requests, error } = await supabase
-    .from("requests")
-    .select(
-      "id, club_id, usage_date, start_time, end_time, reason, status, created_at, updated_at, clubs(name), request_classrooms(classroom_id, classrooms(id, class_name, grade))"
-    )
-    .order("created_at", { ascending: false });
-
-  const all = (requests ?? []) as unknown as RequestWithClub[];
-  const pending = all.filter((r) => r.status === "pending");
-  const rest = all.filter((r) => r.status !== "pending");
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-5xl space-y-8">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Link
-              href="/school-admin/dashboard"
-              className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              ← Dashboard
-            </Link>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Requests
-            </h1>
-          </div>
-          <SignOutButton loginPath="/school-admin/login" />
-        </header>
-
-        {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            Failed to load requests: {error.message}
-          </p>
-        ) : (
-          <>
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                Pending ({pending.length})
-              </h2>
-              {pending.length === 0 ? (
-                <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-                  No pending requests.
-                </p>
-              ) : (
-                <ul className="space-y-3">
-                  {pending.map((r) => (
-                    <li key={r.id}>
-                      <Link
-                        href={`/school-admin/requests/${r.id}`}
-                        className="block rounded-xl border border-neutral-200 p-4 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-sm font-medium">
-                            {r.clubs.name}
-                          </span>
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
-                          >
-                            {r.status}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-sm">
-                          {r.usage_date} · {r.start_time.slice(0, 5)}–
-                          {r.end_time.slice(0, 5)}
-                        </p>
-                        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-                          {r.request_classrooms
-                            .map((rc) => rc.classrooms.class_name)
-                            .join(", ")}
-                        </p>
-                        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                          {new Date(r.created_at).toLocaleString()}
-                        </p>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-
-            <section className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                History
-              </h2>
-              {rest.length === 0 ? (
-                <p className="rounded-xl border border-neutral-200 p-6 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
-                  No processed requests yet.
-                </p>
-              ) : (
-                <ul className="space-y-3">
-                  {rest.map((r) => (
-                    <li key={r.id}>
-                      <Link
-                        href={`/school-admin/requests/${r.id}`}
-                        className="block rounded-xl border border-neutral-200 p-4 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-sm font-medium">
-                            {r.clubs.name}
-                          </span>
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
-                          >
-                            {r.status}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-sm">
-                          {r.usage_date} · {r.start_time.slice(0, 5)}–
-                          {r.end_time.slice(0, 5)}
-                        </p>
-                        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-                          {r.request_classrooms
-                            .map((rc) => rc.classrooms.class_name)
-                            .join(", ")}
-                        </p>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          </>
-        )}
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1857: character maps to <undefined>
 
 
 ================================================
@@ -2506,113 +1299,7 @@ export { default } from "@/components/page-loading";
 ================================================
 FILE: app/school-admin/requests/[id]/page.tsx
 ================================================
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import type { ClubRequest } from "@/lib/types";
-import ApproveRejectForm from "@/components/approve-reject-form";
-
-export const dynamic = "force-dynamic";
-export const metadata = { title: "Request detail · School Admin" };
-
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  accepted: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  cancelled: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
-};
-
-type RequestWithClub = ClubRequest & { clubs: { name: string } };
-
-export default async function RequestDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  await requireRole("school_admin");
-  const { id } = await params;
-  const supabase = await createClient();
-
-  const { data: request } = await supabase
-    .from("requests")
-    .select(
-      "id, club_id, usage_date, start_time, end_time, reason, status, created_at, updated_at, clubs(name), request_classrooms(classroom_id, classrooms(id, class_name, grade))"
-    )
-    .eq("id", id)
-    .single();
-
-  if (!request) notFound();
-
-  const r = request as unknown as RequestWithClub;
-
-  return (
-    <main className="min-h-screen px-4 py-8 sm:px-8">
-      <div className="mx-auto w-full max-w-2xl space-y-6">
-        <div>
-          <Link
-            href="/school-admin/requests"
-            className="text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-          >
-            ← Requests
-          </Link>
-        </div>
-
-        <div className="rounded-xl border border-neutral-200/70 bg-white shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900 p-6">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">
-              {r.clubs.name}
-            </h1>
-            <span
-              className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
-            >
-              {r.status}
-            </span>
-          </div>
-
-          <dl className="mt-4 space-y-3 text-sm">
-            <div>
-              <dt className="text-neutral-500 dark:text-neutral-400">Date</dt>
-              <dd className="font-medium">{r.usage_date}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500 dark:text-neutral-400">Time</dt>
-              <dd className="font-medium">
-                {r.start_time.slice(0, 5)}–{r.end_time.slice(0, 5)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500 dark:text-neutral-400">
-                Classrooms
-              </dt>
-              <dd className="font-medium">
-                {r.request_classrooms
-                  .map((rc) => rc.classrooms.class_name)
-                  .join(", ")}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500 dark:text-neutral-400">
-                Reason
-              </dt>
-              <dd className="font-medium">{r.reason}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500 dark:text-neutral-400">
-                Requested
-              </dt>
-              <dd className="font-medium">
-                {new Date(r.created_at).toLocaleString()}
-              </dd>
-            </div>
-                      {r.status === "pending" && <ApproveRejectForm requestId={r.id} />}
-          </dl>
-        </div>
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1785: character maps to <undefined>
 
 
 ================================================
@@ -2633,7 +1320,7 @@ import SignOutButton from "@/components/sign-out-button";
 import SettingsForm from "@/components/settings-form";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Settings · School Admin" };
+export const metadata = { title: "Settings Â· School Admin" };
 
 export default async function SchoolAdminSettings() {
   await requireRole("school_admin");
@@ -2926,212 +1613,7 @@ export default function ChangePasswordButton() {
 ================================================
 FILE: components/classroom-calendar-modal.tsx
 ================================================
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import type { Classroom } from "@/lib/types";
-
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-function pad(n: number) {
-  return n.toString().padStart(2, "0");
-}
-function toDateString(y: number, m: number, d: number) {
-  return `${y}-${pad(m + 1)}-${pad(d)}`;
-}
-
-export default function ClassroomCalendarModal({
-  classroom,
-  canRequest,
-  onClose,
-}: {
-  classroom: Classroom;
-  canRequest: boolean;
-  onClose: () => void;
-}) {
-  const router = useRouter();
-  const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
-  const [bookedDates, setBookedDates] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [pickedDate, setPickedDate] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-
-    const start = toDateString(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    const end = toDateString(year, month, lastDay);
-
-    const supabase = createClient();
-    supabase
-      .rpc("classroom_booked_dates", {
-        p_classroom_id: classroom.id,
-        p_start_date: start,
-        p_end_date: end,
-      })
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        setLoading(false);
-        if (error || !data) return;
-        setBookedDates(
-          new Set((data as { usage_date: string }[]).map((r) => r.usage_date))
-        );
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [classroom.id, year, month]);
-
-  function changeMonth(delta: number) {
-    setPickedDate(null);
-    let newMonth = month + delta;
-    let newYear = year;
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear -= 1;
-    } else if (newMonth > 11) {
-      newMonth = 0;
-      newYear += 1;
-    }
-    setMonth(newMonth);
-    setYear(newYear);
-  }
-
-  const firstWeekday = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [
-    ...Array(firstWeekday).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="w-full max-w-sm rounded-xl border border-neutral-200/70 bg-white p-5 shadow-lg dark:border-neutral-800/70 dark:bg-neutral-900">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">
-            {classroom.class_name}
-            <span className="ml-2 font-normal text-neutral-400">
-              (Grade {classroom.grade})
-            </span>
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => changeMonth(-1)}
-            className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-          >
-            ←
-          </button>
-          <p className="text-sm font-medium">
-            {MONTH_NAMES[month]} {year}
-          </p>
-          <button
-            type="button"
-            onClick={() => changeMonth(1)}
-            className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-          >
-            →
-          </button>
-        </div>
-
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-neutral-400">
-          {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-            <div key={i}>{d}</div>
-          ))}
-        </div>
-
-        <div className="mt-1 grid grid-cols-7 gap-1">
-          {cells.map((day, i) => {
-            if (day === null) return <div key={i} />;
-            const dateStr = toDateString(year, month, day);
-            const booked = bookedDates.has(dateStr);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => canRequest && setPickedDate(dateStr)}
-                disabled={!canRequest}
-                className={`flex aspect-square items-center justify-center rounded-full text-xs font-medium ${
-                  booked
-                    ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
-                    : "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
-                } ${canRequest ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
-              >
-                {day}
-              </button>
-            );
-          })}
-        </div>
-
-        {loading && (
-          <p className="mt-3 text-center text-xs text-neutral-400">
-            Loading availability…
-          </p>
-        )}
-
-        <div className="mt-4 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
-          <span className="flex items-center gap-1">
-            <span className="h-3 w-3 rounded-full bg-green-100 dark:bg-green-950" />
-            Available
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="h-3 w-3 rounded-full bg-red-100 dark:bg-red-950" />
-            Booked
-          </span>
-        </div>
-      </div>
-
-      {pickedDate && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-xs rounded-xl border border-neutral-200/70 bg-white p-5 text-center shadow-lg dark:border-neutral-800/70 dark:bg-neutral-900">
-            <p className="text-sm font-medium">
-              Create a request on {pickedDate}?
-            </p>
-            <div className="mt-4 flex gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  router.push(
-                    `/club-admin/requests/new?date=${pickedDate}&classroom=${classroom.id}`
-                  )
-                }
-                className="flex-1 rounded-md bg-neutral-900 py-2 text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
-              >
-                Yes
-              </button>
-              <button
-                type="button"
-                onClick={() => setPickedDate(null)}
-                className="flex-1 rounded-md border border-neutral-300 py-2 text-sm font-medium dark:border-neutral-700"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 3581: character maps to <undefined>
 
 
 ================================================
@@ -3652,7 +2134,7 @@ export default function ClubAccountsManager({ clubId }: { clubId: string }) {
       </p>
 
       {loading ? (
-        <p className="text-sm text-neutral-400">Loading…</p>
+        <p className="text-sm text-neutral-400">Loadingâ€¦</p>
       ) : accounts.length === 0 ? (
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
           No accounts connected yet.
@@ -3697,7 +2179,7 @@ export default function ClubAccountsManager({ clubId }: { clubId: string }) {
           className="space-y-2 border-t border-neutral-200 pt-3 dark:border-neutral-800"
         >
           <p className="text-xs text-neutral-400">
-            Email invites require SMTP to be configured — self-registration via the
+            Email invites require SMTP to be configured â€” self-registration via the
             login page&apos;s Register link works without it.
           </p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -3733,169 +2215,7 @@ export default function ClubAccountsManager({ clubId }: { clubId: string }) {
 ================================================
 FILE: components/club-calendar.tsx
 ================================================
-"use client";
-
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-type Booking = {
-  usage_date: string;
-  classroom_name: string;
-  start_time: string;
-  end_time: string;
-  reason: string;
-};
-
-function pad(n: number) {
-  return n.toString().padStart(2, "0");
-}
-function toDateString(y: number, m: number, d: number) {
-  return `${y}-${pad(m + 1)}-${pad(d)}`;
-}
-
-export default function ClubCalendar({ clubId }: { clubId: string }) {
-  const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setSelectedDate(null);
-
-    const start = toDateString(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    const end = toDateString(year, month, lastDay);
-
-    const supabase = createClient();
-    supabase
-      .rpc("club_booked_dates", {
-        p_club_id: clubId,
-        p_start_date: start,
-        p_end_date: end,
-      })
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        setLoading(false);
-        if (error || !data) return;
-        setBookings(data as Booking[]);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [clubId, year, month]);
-
-  function changeMonth(delta: number) {
-    let newMonth = month + delta;
-    let newYear = year;
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear -= 1;
-    } else if (newMonth > 11) {
-      newMonth = 0;
-      newYear += 1;
-    }
-    setMonth(newMonth);
-    setYear(newYear);
-  }
-
-  const bookedDates = new Set(bookings.map((b) => b.usage_date));
-  const firstWeekday = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [
-    ...Array(firstWeekday).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
-  const selectedBookings = selectedDate
-    ? bookings.filter((b) => b.usage_date === selectedDate)
-    : [];
-
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => changeMonth(-1)}
-          className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-        >
-          ←
-        </button>
-        <p className="text-sm font-medium">
-          {MONTH_NAMES[month]} {year}
-        </p>
-        <button
-          type="button"
-          onClick={() => changeMonth(1)}
-          className="rounded-md px-2 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-        >
-          →
-        </button>
-      </div>
-
-      <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-neutral-400">
-        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div key={i}>{d}</div>
-        ))}
-      </div>
-
-      <div className="mt-1 grid grid-cols-7 gap-1">
-        {cells.map((day, i) => {
-          if (day === null) return <div key={i} />;
-          const dateStr = toDateString(year, month, day);
-          const booked = bookedDates.has(dateStr);
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => booked && setSelectedDate(dateStr)}
-              disabled={!booked}
-              className={`flex aspect-square items-center justify-center rounded-full text-xs font-medium ${
-                booked
-                  ? "cursor-pointer bg-green-100 text-green-700 hover:opacity-80 dark:bg-green-950 dark:text-green-300"
-                  : "text-neutral-400 dark:text-neutral-600"
-              }`}
-            >
-              {day}
-            </button>
-          );
-        })}
-      </div>
-
-      {loading && (
-        <p className="mt-3 text-center text-xs text-neutral-400">Loading…</p>
-      )}
-
-      {selectedDate && selectedBookings.length > 0 && (
-        <div className="mt-4 space-y-2 rounded-lg border border-neutral-200/70 bg-neutral-50 p-3 dark:border-neutral-800/70 dark:bg-neutral-800">
-          <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-            {selectedDate}
-          </p>
-          {selectedBookings.map((b, i) => (
-            <div key={i} className="text-sm">
-              <p className="font-medium">
-                {b.classroom_name} · {b.start_time.slice(0, 5)}–
-                {b.end_time.slice(0, 5)}
-              </p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                {b.reason}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 2756: character maps to <undefined>
 
 
 ================================================
@@ -3956,7 +2276,7 @@ export default function ClubDetailModal({
             onClick={onClose}
             className="rounded-md px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
-            ✕
+            âœ•
           </button>
         </div>
 
@@ -3970,14 +2290,14 @@ export default function ClubDetailModal({
           <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">President</p>
-              <p className="font-medium">{club.president_name ?? "—"}</p>
+              <p className="font-medium">{club.president_name ?? "â€”"}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
                 {club.president_phone ?? ""}
               </p>
             </div>
             <div>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">Vice President</p>
-              <p className="font-medium">{club.vice_president_name ?? "—"}</p>
+              <p className="font-medium">{club.vice_president_name ?? "â€”"}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
                 {club.vice_president_phone ?? ""}
               </p>
@@ -4108,7 +2428,7 @@ export default function ClubForm({ club, onDone }: Props) {
       router.refresh();
 
       if (!res.ok) {
-        // Club row is already saved — let them retry the invite here
+        // Club row is already saved â€” let them retry the invite here
         // instead of losing everything they just filled in.
         setError(`Club created, but the invite failed: ${inviteResult.error}`);
         setCreatedClubId(newClub.id);
@@ -4241,7 +2561,7 @@ export default function ClubForm({ club, onDone }: Props) {
             />
           </div>
           <p className="text-xs text-neutral-400">
-            A verification email is sent to set up their own password — you never see or set it.
+            A verification email is sent to set up their own password â€” you never see or set it.
           </p>
         </div>
       )}
@@ -4553,7 +2873,7 @@ export default function LoginForm({ role, t }: { role: Role; t: LoginDict }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 pr-16 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               />
               <button
                 type="button"
@@ -4711,203 +3031,7 @@ export default function PendingAccountsManager({
 ================================================
 FILE: components/register-form.tsx
 ================================================
-"use client";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-
-type ClubOption = { id: string; name: string };
-
-export default function RegisterForm() {
-  const [clubs, setClubs] = useState<ClubOption[]>([]);
-  const [clubId, setClubId] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/clubs/public-list")
-      .then((res) => res.json())
-      .then((data) => setClubs(data.clubs ?? []));
-  }, []);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-
-    if (!displayName.trim() || !email.trim() || !clubId) {
-      setError("All fields are required.");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    const supabase = createClient();
-
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    });
-
-    if (signUpError || !signUpData.user) {
-      setLoading(false);
-      setError(signUpError?.message ?? "Registration failed.");
-      return;
-    }
-
-    if (!signUpData.session) {
-      setLoading(false);
-      setError(
-        "Registration succeeded but no session was returned. Email confirmation may still be enabled — contact the school admin."
-      );
-      return;
-    }
-
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: signUpData.user.id,
-      display_name: displayName.trim(),
-      role: "club_admin",
-      club_id: clubId,
-      status: "pending",
-    });
-
-    if (profileError) {
-      setLoading(false);
-      setError(profileError.message);
-      return;
-    }
-
-    await supabase.auth.signOut();
-    setLoading(false);
-    setSubmitted(true);
-  }
-
-  if (submitted) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-xl border border-neutral-200/70 bg-white p-6 text-center shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900">
-          <h1 className="text-lg font-semibold">Registration submitted</h1>
-          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-            Your account is waiting for school admin approval. You&apos;ll be
-            able to log in once it&apos;s accepted.
-          </p>
-          <Link
-            href="/club-admin/login"
-            className="mt-4 inline-block text-sm text-neutral-600 hover:underline dark:text-neutral-300"
-          >
-            Back to login
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <Link
-          href="/club-admin/login"
-          className="mb-4 inline-block text-sm text-neutral-500 hover:underline dark:text-neutral-400"
-        >
-          ← Back to login
-        </Link>
-
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Register Club Admin Account
-          </h1>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-xl border border-neutral-200/70 bg-white p-6 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900"
-        >
-          {error && (
-            <div className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Club</label>
-            <select
-              value={clubId}
-              onChange={(e) => setClubId(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-            >
-              <option value="">Select a club</option>
-              {clubs.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Username</label>
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Confirm password</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-neutral-900 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
-          >
-            {loading ? "Submitting..." : "Register"}
-          </button>
-        </form>
-      </div>
-    </main>
-  );
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 3510: character maps to <undefined>
 
 
 ================================================
@@ -5087,7 +3211,7 @@ export default function RequestForm({
           Classrooms
           {checkingAvailability && (
             <span className="ml-2 text-xs font-normal text-neutral-400">
-              checking availability…
+              checking availabilityâ€¦
             </span>
           )}
         </label>
@@ -5184,7 +3308,7 @@ export default function SetPasswordForm() {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Password set. Redirecting…
+          Password set. Redirectingâ€¦
         </p>
       </main>
     );
@@ -5485,177 +3609,7 @@ export async function requireRole(role: UserRole): Promise<Profile> {
 ================================================
 FILE: lib/i18n.ts
 ================================================
-import { cookies } from "next/headers";
-
-export type Locale = "en" | "id";
-
-export interface HomeDict {
-  title: string;
-  subtitle: string;
-  schoolAdmin: string;
-  clubAdmin: string;
-}
-
-export interface LoginDict {
-  schoolTitle: string;
-  schoolSubtitle: string;
-  clubTitle: string;
-  clubSubtitle: string;
-  email: string;
-  password: string;
-  show: string;
-  hide: string;
-  signIn: string;
-  signingIn: string;
-  back: string;
-  tryClub: string;
-  trySchool: string;
-}
-
-export interface SettingsDict {
-  title: string;
-  theme: string;
-  light: string;
-  dark: string;
-  language: string;
-  back: string;
-}
-
-export interface DashboardDict {
-  schoolAdminLabel: string;
-  clubAdminLabel: string;
-  pendingTitle: string;
-  pendingDesc: string;
-  classroomsTitle: string;
-  classroomsDescSchool: string;
-  classroomsDescClub: string;
-  clubsTitle: string;
-  clubsDesc: string;
-  myRequestsTitle: string;
-  myRequestsDesc: string;
-  responsesTitle: string;
-  responsesDesc: string;
-  settingsLabel: string;
-  signOut: string;
-}
-
-interface Dictionary {
-  home: HomeDict;
-  login: LoginDict;
-  settings: SettingsDict;
-  dashboard: DashboardDict;
-}
-
-export const dictionaries: Record<Locale, Dictionary> = {
-  en: {
-    home: {
-      title: "School Class Booking",
-      subtitle:
-        "Request classrooms for your club, and let school administrators review, approve, or reject them.",
-      schoolAdmin: "School Admin",
-      clubAdmin: "Club Admin",
-    },
-    login: {
-      schoolTitle: "School Admin Login",
-      schoolSubtitle: "Enter your credentials to access the admin panel",
-      clubTitle: "Club Admin Login",
-      clubSubtitle: "Enter your credentials to manage your club's bookings",
-      email: "Email",
-      password: "Password",
-      show: "Show",
-      hide: "Hide",
-      signIn: "Sign in",
-      signingIn: "Signing in...",
-      back: "← Back",
-      tryClub: "Try logging in as Club Admin",
-      trySchool: "Try logging in as School Admin",
-    },
-    settings: {
-      title: "Settings",
-      theme: "Appearance",
-      light: "Light",
-      dark: "Dark",
-      language: "Language",
-      back: "← Dashboard",
-    },
-    dashboard: {
-      schoolAdminLabel: "School Admin",
-      clubAdminLabel: "Club Admin",
-      pendingTitle: "Pending requests",
-      pendingDesc: "Review, accept, or reject classroom requests",
-      classroomsTitle: "Classrooms",
-      classroomsDescSchool: "View classroom list and availability",
-      classroomsDescClub: "Check availability and pick rooms",
-      clubsTitle: "Clubs",
-      clubsDesc: "View registered clubs",
-      myRequestsTitle: "My requests",
-      myRequestsDesc: "Create, edit, or cancel requests",
-      responsesTitle: "Responses",
-      responsesDesc: "View accepted or rejected requests",
-      settingsLabel: "Settings",
-      signOut: "Sign out",
-    },
-  },
-  id: {
-    home: {
-      title: "Pemesanan Kelas Sekolah",
-      subtitle:
-        "Ajukan ruang kelas untuk klub kamu, dan biarkan admin sekolah meninjau, menyetujui, atau menolaknya.",
-      schoolAdmin: "Admin Sekolah",
-      clubAdmin: "Admin Klub",
-    },
-    login: {
-      schoolTitle: "Login Admin Sekolah",
-      schoolSubtitle: "Masukkan kredensial untuk mengakses panel admin",
-      clubTitle: "Login Admin Klub",
-      clubSubtitle: "Masukkan kredensial untuk mengelola pemesanan klub kamu",
-      email: "Email",
-      password: "Kata Sandi",
-      show: "Tampilkan",
-      hide: "Sembunyikan",
-      signIn: "Masuk",
-      signingIn: "Sedang masuk...",
-      back: "← Kembali",
-      tryClub: "Coba masuk sebagai Admin Klub",
-      trySchool: "Coba masuk sebagai Admin Sekolah",
-    },
-    settings: {
-      title: "Pengaturan",
-      theme: "Tampilan",
-      light: "Terang",
-      dark: "Gelap",
-      language: "Bahasa",
-      back: "← Dasbor",
-    },
-    dashboard: {
-      schoolAdminLabel: "Admin Sekolah",
-      clubAdminLabel: "Admin Klub",
-      pendingTitle: "Permintaan tertunda",
-      pendingDesc: "Tinjau, setujui, atau tolak permintaan ruang kelas",
-      classroomsTitle: "Ruang Kelas",
-      classroomsDescSchool: "Lihat daftar ruang kelas dan ketersediaannya",
-      classroomsDescClub: "Cek ketersediaan dan pilih ruangan",
-      clubsTitle: "Klub",
-      clubsDesc: "Lihat klub terdaftar",
-      myRequestsTitle: "Permintaan saya",
-      myRequestsDesc: "Buat, ubah, atau batalkan permintaan",
-      responsesTitle: "Tanggapan",
-      responsesDesc: "Lihat permintaan yang diterima atau ditolak",
-      settingsLabel: "Pengaturan",
-      signOut: "Keluar",
-    },
-  },
-};
-
-export async function getLocale(): Promise<Locale> {
-  const cookieStore = await cookies();
-  return cookieStore.get("locale")?.value === "id" ? "id" : "en";
-}
-
-export function getDictionary(locale: Locale): Dictionary {
-  return dictionaries[locale];
-}
-
+Error reading file with 'cp1252': 'charmap' codec can't decode byte 0x90 in position 1950: character maps to <undefined>
 
 
 ================================================

@@ -90,7 +90,22 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+/* Custom Dashboard Card Colors */
+.card-teal {
+  background-color: #86BCBD;
+}
 
+.card-yellow {
+  background-color: #F7E49B;
+}
+
+.card-green {
+  background-color: #A4CE8B;
+}
+
+.card-white {
+  background-color: #ffffff;
+}
 body {
   background: var(--background);
   color: var(--foreground);
